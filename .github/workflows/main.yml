@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd /var/www/chupep_web
+            cd /var/www/chupep_web/Chupep_Web
             ./deploy.sh
