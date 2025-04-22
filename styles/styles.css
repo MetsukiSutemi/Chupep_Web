@@ -156,3 +156,53 @@ button[type="submit"]:hover {
 .password-wrapper .togglePassword:hover {
     opacity: 1;
 }
+
+/* Адаптивная верстка */
+@media (max-width: 768px) {
+    header {
+        height: auto;
+        padding: 10px 0;
+    }
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+    .menu-buttons {
+        width: 100%;
+        justify-content: space-around;
+        margin: 10px 0;
+    }
+    .auth-buttons {
+        width: 100%;
+        justify-content: space-around;
+        margin: 10px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 20px;
+    }
+    .menu-buttons button,
+    .auth-buttons button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    .modal {
+        width: 90%;
+        max-width: 90%;
+        padding: 10px;
+    }
+    .modal-content {
+        padding: 20px;
+    }
+    input[type="email"], input[type="password"], input[type="text"] {
+        padding: 10px;
+        font-size: 14px;
+    }
+    .password-wrapper .togglePassword {
+        font-size: 12px;
+        right: 5px;
+    }
+}
