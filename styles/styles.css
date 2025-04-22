@@ -164,8 +164,10 @@ button[type="submit"]:hover {
         padding: 10px 0;
     }
     .header-content {
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
         padding: 0 15px;
     }
     .menu-buttons {
