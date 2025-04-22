@@ -9,83 +9,57 @@
 <body>
     <header>
         <div class="header-content">
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="openModal('registerModal')">Зарегистрироваться</button>
-                <button class="btn btn-secondary" onclick="openModal('loginModal')">Войти</button>
+            <div class="logo">Chupep</div>
+            <nav class="menu-buttons">
+                <button>Главная</button>
+                <button>Продукты</button>
+            </nav>
+            <div class="auth-buttons">
+                <button id="registerBtn">Регистрация</button>
+                <button id="loginBtn">Авторизация</button>
             </div>
         </div>
     </header>
+    <main>
+        <!-- Основное содержимое страницы -->
+    </main>
 
-    <div class="main-content">
-        <div class="container">
-            <h1>Добро пожаловать в Chupep</h1>
-            <p>Выберите действие в верхнем меню</p>
-        </div>
-    </div>
-
-    <!-- Модальное окно регистрации -->
-    <div id="registerModal" class="modal">
+    <!-- Модальное окно для регистрации -->
+    <div id="registrationMenu" class="modal hidden">
         <div class="modal-content">
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="regEmail">Email</label>
-                    <input type="email" id="regEmail" required>
+            <span class="closeBtn">&times;</span>
+            <h2>Регистрация</h2>
+            <form id="registrationForm">
+                <input type="email" id="regEmail" placeholder="Email" required>
+                <div class="password-wrapper">
+                    <input type="password" id="regPassword" placeholder="Пароль" required>
+                    <button type="button" class="togglePassword" data-target="regPassword">Показать</button>
                 </div>
-                <div class="form-group">
-                    <label for="regPassword">Пароль</label>
-                    <input type="password" id="regPassword" required>
+                <div class="password-wrapper">
+                    <input type="password" id="regConfirmPassword" placeholder="Подтвердите пароль" required>
+                    <button type="button" class="togglePassword" data-target="regConfirmPassword">Показать</button>
                 </div>
-                <div class="form-group">
-                    <label for="regConfirmPassword">Подтвердите пароль</label>
-                    <input type="password" id="regConfirmPassword" required>
-                </div>
-                <button type="submit" class="form-submit">Зарегистрироваться</button>
+                <button type="submit">Зарегистрироваться</button>
             </form>
         </div>
     </div>
 
-    <!-- Модальное окно входа -->
-    <div id="loginModal" class="modal">
+    <!-- Модальное окно для авторизации -->
+    <div id="loginMenu" class="modal hidden">
         <div class="modal-content">
+            <span class="closeBtn">&times;</span>
+            <h2>Авторизация</h2>
             <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required>
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <div class="password-wrapper">
+                    <input type="password" id="loginPassword" placeholder="Пароль" required>
+                    <button type="button" class="togglePassword" data-target="loginPassword">Показать</button>
                 </div>
-                <div class="form-group">
-                    <label for="loginPassword">Пароль</label>
-                    <input type="password" id="loginPassword" required>
-                </div>
-                <button type="submit" class="form-submit">Войти</button>
+                <button type="submit">Войти</button>
             </form>
         </div>
     </div>
 
-    <script>
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.style.display = 'block';
-        }
-
-        // Закрытие модального окна при клике вне его
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Обработка форм
-        document.getElementById('registerForm').onsubmit = function(e) {
-            e.preventDefault();
-            alert('Регистрация успешна!');
-            document.getElementById('registerModal').style.display = 'none';
-        }
-
-        document.getElementById('loginForm').onsubmit = function(e) {
-            e.preventDefault();
-            alert('Вход выполнен!');
-            document.getElementById('loginModal').style.display = 'none';
-        }
-    </script>
+    <script src="js/script.js"></script>
 </body>
-</html> 
+</html>
