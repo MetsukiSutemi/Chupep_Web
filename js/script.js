@@ -54,4 +54,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 	});
+
+	// Логика открытия/закрытия мобильного меню
+	const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+	const mobileMenu = document.getElementById('mobileMenu');
+	mobileMenuBtn.addEventListener('click', function() {
+		mobileMenu.classList.toggle('active');
+	});
+
+	// Обработчики для кнопок мобильного меню
+	document.getElementById('registerBtnMobile').addEventListener('click', function() {
+		openMenu(registrationMenu);
+		mobileMenu.classList.remove('active');
+	});
+	document.getElementById('loginBtnMobile').addEventListener('click', function() {
+		openMenu(loginMenu);
+		mobileMenu.classList.remove('active');
+	});
 })

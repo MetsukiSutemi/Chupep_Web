@@ -206,3 +206,64 @@ button[type="submit"]:hover {
         right: 5px;
     }
 }
+
+/* Hamburger и мобильное меню */
+.hamburger {
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1002;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+.mobile-menu.active {
+    display: block;
+}
+
+.mobile-menu-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.mobile-menu-item {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.mobile-menu-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Скрываем desktop меню и показываем hamburger на мобильных */
+@media (max-width: 768px) {
+    .menu-buttons, .auth-buttons {
+        display: none;
+    }
+    .hamburger {
+        display: block;
+    }
+}
