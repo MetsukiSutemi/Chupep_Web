@@ -269,3 +269,258 @@ button[type="submit"]:hover {
         display: block;
     }
 }
+
+/* Стили для секции проектов */
+main {
+    margin-top: 60px; /* убираем дополнительный отступ сверху */
+    padding: 0; /* убираем боковые отступы */
+}
+
+.project-list h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.project-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.project-btn {
+    align-self: center;
+    padding: 10px 20px;
+    border: none;
+    background-color: hsl(265, 100%, 50%);
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.project-btn:hover {
+    background-color: hsl(265, 100%, 60%);
+}
+
+/* Адаптивность для секции проектов */
+@media (max-width: 768px) {
+    .project-list-grid {
+        gap: 15px;
+    }
+    .project-card {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-list-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Стили для приветственного блока */
+.hero {
+    height: calc(100vh - 60px);
+    background: linear-gradient(135deg, rgba(102,126,234,0.8), rgba(118,75,162,0.8));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    padding: 0; /* убираем боковые отступы */
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%);
+    top: 20%;
+    right: 10%;
+    transform: translate(50%, -50%);
+    filter: blur(120px);
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 600px;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+#ctaProjectsBtn {
+    padding: 12px 30px;
+    background-color: hsl(265, 100%, 50%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+#ctaProjectsBtn:hover {
+    background-color: hsl(265, 100%, 60%);
+}
+
+/* Стили для страницы профиля */
+.profile {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(47,11,71,0.8), rgba(30,0,59,0.8));
+    padding: 20px 0;
+}
+
+.profile-container {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+    color: #fff;
+}
+
+.profile-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-container .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.profile-container .form-group input {
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.password-wrapper label {
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: hsl(265, 100%, 50%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: hsl(265, 100%, 60%);
+}
+
+/* Layout для страницы профиля с sidebar */
+.profile-layout {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.profile-sidebar {
+    min-width: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+}
+
+.profile-sidebar .sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-sidebar .sidebar-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+.profile-sidebar .sidebar-item:hover {
+    background: rgba(255,255,255,0.2);
+}
+.profile-sidebar .sidebar-item.active {
+    background: rgba(255,255,255,0.3);
+    font-weight: bold;
+}
+
+/* Расширение контейнера профиля внутри layout */
+.profile-layout .profile-container {
+    flex: 1;
+    max-width: none;
+    width: auto;
+}
