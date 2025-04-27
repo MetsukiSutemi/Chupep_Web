@@ -802,3 +802,14 @@ main {
     font-size: 0.8rem;
     color: #666;
 }
+
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+    background-color: var(--input-bg) !important;
+    background-image: none !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+    box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
