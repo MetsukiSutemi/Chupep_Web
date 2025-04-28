@@ -1,0 +1,280 @@
+*, *::before, *::after {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+   }
+
+   html, body {
+     width: 100%;
+     min-height: 100vh;
+     /* Чтобы работать с высотой в процентах */
+     height: 100%;
+     /* Плавная прокрутка */
+     scroll-behavior: smooth;
+     /* Цветовая схема (для форм, чекбоксов и т.п.) */
+     color-scheme: light dark;
+     /* Шрифты и базовые настройки текста */
+     font-family: Arial, sans-serif;
+     line-height: 1.5;
+     color: #333;               /* цвет основного текста */
+     background: linear-gradient(to bottom right, #3c9eee, #ff31e4); /* градиент фона */
+     display: flex;
+     flex-direction: column;
+   }
+
+
+header{
+    background-color: #383838;
+    height: 60px;
+    padding: 10px;
+    margin: 0px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+
+}
+main{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button{
+    background-color: #2c2c2c;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid #4d4c4c;
+}
+
+button:hover{
+    background-color: #3c3c3c;
+}
+
+button:active{
+    background-color: #4c4c4c;
+    transform: scale(0.95);
+}
+
+.menu{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+
+}
+
+.user{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+
+
+.profile{
+    height: 75%;
+    width: 75%;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #333333;
+    opacity: 0.8;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    
+}
+
+.profile-header{
+    display: flex;
+    gap: 10px;
+    color: #fff;
+    border-right: 1px solid rgba(255,255,255,0.5);
+    padding-right: 10px;
+    margin-right: 15px;
+    flex-direction: column;
+}
+
+.avatar-label {
+  cursor: pointer;      /* курсор «рука» при наведении */
+  display: inline-block;
+  border-radius: 50%;   /* при желании обрамить кругом */
+  overflow: hidden;
+}
+
+.avatar-label img {
+  display: block;       /* убирать лишние отступы */
+  width: 100px;
+  height: 100px;
+  object-fit: cover;    /* красиво вписать любые изображения */
+  transition: opacity .2s;
+}
+
+.avatar-label img:hover {
+  opacity: 0.6;         /* легкий эффект наведения */
+}
+
+.profile-header-user-info{
+    display: flex;
+    gap: 10px;
+}
+
+.profile-header-text{
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-header img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    
+
+}
+
+.profile-main{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #fff;
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+.profile-main-text{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.profile-main-text button{
+    border: 1px solid #4d4c4c;
+    
+}
+
+.profile-header-bar{ 
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-header-bar button{
+    display: flex;
+    width: 100%;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0px;
+    border: none;
+    background-color: #3b3b3b;
+}
+
+.profile-header-bar button:hover{
+    background-color: #4c4c4c;
+}
+
+.tab-btn-exit{
+    margin-top: auto;
+}
+
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.account-info{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.account-info-item{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+
+
+.password-info{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+
+.devices{
+    color: #e61818;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.device-info{
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.device{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-direction: column;
+    max-width: 200px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+
+}
+
+.device-buttons{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.device-status{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #48ff00;
+}
+
+.device-ip{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #ffffff;
+}
+
+
+
+
+
+
+
+
+
+
+

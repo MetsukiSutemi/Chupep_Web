@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chupep</title>
+    <link rel="stylesheet" href="styles/profile_styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Chupep</h1>
+        </div>
+        <div class="menu">
+            <button>Главная</button>
+            <button>Проекты</button>
+        </div>
+        <div class="user">
+            <button>Выйти</button>
+        </div>
+    </header>
+    <main>
+        <div class="profile">
+            <div class="profile-header">
+                <div class="profile-header-user-info">
+                    <label for="avatarInput" class="avatar-label">
+                    <img id="avatarImg" 
+                        src="photo_2024-03-12_13-37-16.jpg" 
+                        alt="Profile avatar">
+                    </label>
+                    <!-- скрытый input -->
+                    <input type="file" 
+                            id="avatarInput" 
+                            accept="image/*" 
+                            style="display: none;">
+                <!-- остальной текст -->
+                    <div class="profile-header-text">
+                        <h2>Username</h2>
+                        <h4>@username</h4>
+                    </div>
+                </div>
+                <div class="profile-header-bar">
+                    <button class="tab-btn active" data-target="settings">Настройки</button>
+                    <button class="tab-btn" data-target="security">Безопасность</button>
+                    <button class="tab-btn" data-target="notifications">Уведомления</button>
+                    <button class="tab-btn" data-target="devices">Устройства</button>
+                    <button class="tab-btn" data-target="linked-accounts">Привязанные аккаунты</button>
+                    <button class="tab-btn-exit" data-target="exit">Выйти</button>
+                    
+                </div>
+            </div>
+            <div class="profile-main">
+                <div id="settings" class="tab-content">
+                    <div class="account-info">
+                        <p>Настройки аккаунта</p>
+                        <div class="account-info-item">
+                            <p>dadadasdasdasdsadgmail.com</p>
+                            <button>Изменить</button>
+                        </div>
+                        <div class="password-info">
+                            <p>**********</p>
+                            <button>Изменить</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="security" class="tab-content">
+                    <p>Здесь безопасность…</p>
+                </div>
+                <div id="notifications" class="tab-content">
+                    <p>Здесь уведомления…</p>
+                </div>
+                <div id="devices" class="tab-content">
+                    <div class="devices-info">
+                        <p>Устройства</p>
+                        <div class="device">
+                            <div class="device-info">
+                                <div class="device-name">
+                                    <p>Устройство</p>
+                                </div>
+                                <div class="device-status">
+                                    <p>Онлайн</p>
+                                </div>
+                                <div class="device-ip">
+                                    <p>255.255.255.0</p>
+                                </div>
+                            </div>
+                            <div class="device-buttons">
+                                <button>Изменить</button>
+                                <button>Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="linked-accounts" class="tab-content">
+                    <p>Здесь привязанные аккаунты…</p>
+                </div>
+                <div id="exit" class="tab-content">
+                    <p>Вы действительно хотите выйти?</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script src="js/script.js"></script>
+</html>

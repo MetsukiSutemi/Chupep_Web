@@ -1,5 +1,20 @@
 // Жёстко задаём базовый URL API
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://5.129.207.58';
+const tabs = document.querySelectorAll('.tab-btn')
+const contents = document.querySelectorAll('.tab-content')
+
+tabs.forEach(btn => {
+	btn.addEventListener('click', () => {
+		const target = btn.dataset.target
+		// Снимаем active со всех кнопок и секций
+		tabs.forEach(b => b.classList.remove('active'))
+		contents.forEach(c => c.classList.remove('active'))
+		// Вешаем active на нажатую кнопку и её контент
+		btn.classList.add('active')
+		document.getElementById(target).classList.add('active')
+	})
+})
+
 
 document.addEventListener('DOMContentLoaded', function () {
 	const loginBtn = document.getElementById('loginBtn')
@@ -80,31 +95,54 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (registrationForm) {
 		registrationForm.addEventListener('submit', async function(e) {
 			e.preventDefault();
+			const username = document.getElementById('regUsername').value;
 			const email = document.getElementById('regEmail').value;
 			const password = document.getElementById('regPassword').value;
 			const confirmPassword = document.getElementById('regConfirmPassword').value;
+			
 			if (password !== confirmPassword) {
 				alert('Пароли не совпадают');
 				return;
 			}
+
 			try {
-				const res = await fetch(`${API_BASE_URL}/register`, {
+				const res = await fetch(`${API_BASE_URL}/new_user`, {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-					body: JSON.stringify({ email: email, password: password })
+					headers: { 
+						'Content-Type': 'application/json',
+						'Accept': 'application/json' 
+					},
+					body: JSON.stringify({ 
+						username: username,
+						email: email, 
+						password: password 
+					})
 				});
+				
 				const text = await res.text();
+				console.log('Raw response:', text);
+				console.log('Response status:', res.status);
+				
 				let result;
-				try { result = text ? JSON.parse(text) : {}; } catch (e) { result = { detail: text } }
-				console.log('Registration response:', res.status, result);
+				try { 
+					result = text ? JSON.parse(text) : {}; 
+					console.log('Parsed response:', result);
+				} catch (e) { 
+					console.error('JSON parse error:', e);
+					result = { detail: text } 
+				}
+				
 				if (res.ok) {
-					alert(`Пользователь ${result.email} зарегистрирован`);
+					alert(`Пользователь ${result.username} успешно зарегистрирован`);
 					closeAllMenus();
+					openMenu(loginMenu);
 				} else {
-					alert(`Ошибка регистрации ${res.status}: ${result.detail || text}`);
+					const errorMessage = result.detail || text || 'Неизвестная ошибка';
+					console.error('Registration error:', errorMessage);
+					alert(`Ошибка регистрации ${res.status}: ${errorMessage}`);
 				}
 			} catch (err) {
-				console.error('Ошибка регистрации:', err);
+				console.error('Registration error:', err);
 				alert(`Ошибка регистрации: ${err.message}`);
 			}
 		});
@@ -115,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (loginForm) {
 		loginForm.addEventListener('submit', async function(e) {
 			e.preventDefault();
-			const email = document.getElementById('loginEmail').value;
+			const username = document.getElementById('loginUsername').value;
 			const password = document.getElementById('loginPassword').value;
 			try {
 				const res = await fetch(`${API_BASE_URL}/token`, {
@@ -124,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						'Content-Type': 'application/x-www-form-urlencoded',
 						'Accept': 'application/json'
 					},
-					body: new URLSearchParams({ username: email, password: password })
+					body: new URLSearchParams({ username: username, password: password })
 				});
 				// Безопасный разбор ответа
 				const text = await res.text();
