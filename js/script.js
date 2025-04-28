@@ -1,5 +1,5 @@
 // Жёстко задаём базовый URL API
-const API_BASE_URL = 'http://5.129.207.58'
+const API_BASE_URL = 'https://5.129.207.58'
 const tabs = document.querySelectorAll('.tab-btn')
 const contents = document.querySelectorAll('.tab-content')
 
