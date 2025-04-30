@@ -197,249 +197,41 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 	}
+})
 
-	// Загрузка профиля
-	if (window.location.pathname.includes('/profile/')) {
-		console.log('Находимся на странице профиля');
+// Получение данных пользователя
+function fetchUserProfile() {
+	const token = localStorage.getItem('token')
+	if (!token) {
+		window.location.href = '/'
+	}
+}
+
+// Вызываем функции при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+	// Проверяем, находимся ли мы на странице профиля
+	if (window.location.pathname.includes('profile')) {
 		const token = localStorage.getItem('token');
-		console.log('Токен:', token);
-		
 		if (token) {
-			console.log('Начинаем загрузку профиля');
-			fetchUserProfile();
-			initializeProfileEditors();
+			fetchUserProfile(token)
 		} else {
-			console.log('Токен не найден, перенаправляем на главную');
-			window.location.href = '/';
+			window.location.href = '/'
 		}
-	}
-
-	// Обновление профиля
-	const profileForm = document.getElementById('profileForm')
-	if (profileForm) {
-		profileForm.addEventListener('submit', async function (e) {
-			e.preventDefault()
-			const email = document.getElementById('profileEmail').value
-			const password = document.getElementById('profilePassword').value
-			const confirm = document.getElementById('profileConfirmPassword').value
-
-			if (password !== confirm) {
-				alert('Пароли не совпадают')
-				return
-			}
-
-			try {
-				const token = localStorage.getItem('token')
-				const res = await fetch(`${API_BASE_URL}/users/me`, {
-					...baseRequestOptions,
-					method: 'PUT',
-					headers: {
-						...baseRequestOptions.headers,
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify({ email, password }),
-				})
-
-				const text = await res.text()
-				let result
-				try {
-					result = text ? JSON.parse(text) : {}
-				} catch (e) {
-					result = { detail: text }
-				}
-
-				if (res.ok) {
-					alert('Профиль успешно обновлен')
-				} else {
-					alert(`Ошибка обновления профиля: ${result.detail || text}`)
-				}
-			} catch (err) {
-				console.error('Profile update error:', err)
-				alert('Ошибка при обновлении профиля')
-			}
-		})
-	}
-
-	// Функция для получения данных пользователя
-	async function fetchUserProfile() {
-		try {
-			const token = localStorage.getItem('token');
-			if (!token) {
-				console.log('Токен не найден в fetchUserProfile');
-				window.location.href = '/';
-				return;
-			}
-
-			console.log('Отправляем запрос на получение данных пользователя');
-			const response = await fetch(`${API_BASE_URL}/users/me`, {
-				credentials: 'include',
-				headers: {
-					'Authorization': `Bearer ${token}`,
-					'Accept': 'application/json'
-				}
-			});
-
-			console.log('Ответ сервера:', response.status);
-			if (response.ok) {
-				const userData = await response.json();
-				console.log('Получены данные пользователя:', userData);
-				updateProfileUI(userData);
-			} else {
-				if (response.status === 401) {
-					console.log('Ошибка 401: неавторизован');
-					localStorage.removeItem('token');
-					window.location.href = '/';
-				}
-				throw new Error('Ошибка получения данных профиля');
-			}
-		} catch (error) {
-			console.error('Ошибка в fetchUserProfile:', error);
-			alert('Не удалось загрузить данные профиля');
-		}
-	}
-
-	// Функция для загрузки аватара
-	async function loadAvatar() {
-		const token = localStorage.getItem('token');
-		if (!token) return;
-
-		try {
-			const response = await fetch(`${API_BASE_URL}/users/me/get_avatar`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			});
-
-			if (response.ok) {
-				const blob = await response.blob();
-				const avatarImg = document.getElementById('avatarImg');
-				avatarImg.src = URL.createObjectURL(blob);
-			} else {
-				throw new Error('Ошибка загрузки аватара');
-			}
-		} catch (error) {
-			console.error('Ошибка загрузки аватара:', error);
-			const avatarImg = document.getElementById('avatarImg');
-			avatarImg.src = '../image/default-avatar.png';
-		}
-	}
-
-	// Обновляем функцию updateProfileUI
-	function updateProfileUI(userData) {
-		// Загружаем аватар
-		if (userData.avatar) {
-			loadAvatar();
-		}
-
-		// Обновляем имя пользователя
-		const usernameElement = document.querySelector('.profile-header-text h2');
-		usernameElement.textContent = userData.name || userData.username;
-
-		// Обновляем @username
-		const userHandleElement = document.querySelector('.profile-header-text h4');
-		userHandleElement.textContent = `@${userData.username}`;
-
-		// Обновляем email
-		const emailElement = document.querySelector('.account-info-item p');
-		emailElement.textContent = userData.email;
-	}
-
-	// Добавляем обработчики для изменения данных
-	function initializeProfileEditors() {
-		// Обработчик изменения аватара
-		const avatarInput = document.getElementById('avatarInput')
-		avatarInput.addEventListener('change', async (e) => {
-			const file = e.target.files[0]
-			if (!file) return
-
-			const formData = new FormData()
-			formData.append('file', file)
-
-			try {
-				const token = localStorage.getItem('token')
-				const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
-					method: 'PUT',
-					headers: {
-						'Authorization': `Bearer ${token}`
-					},
-					body: formData
-				})
-
-				if (response.ok) {
-					const result = await response.json()
-					updateProfileUI(result)
-					alert('Аватар успешно обновлен')
-				} else {
-					throw new Error('Ошибка обновления аватара')
-				}
-			} catch (error) {
-				console.error('Ошибка:', error)
-				alert('Не удалось обновить аватар')
-			}
-		})
-
-		// Обработчики кнопок изменения
-		const emailButton = document.querySelector('.account-info-item button')
-		emailButton.addEventListener('click', async () => {
-			const newEmail = prompt('Введите новый email:')
-			if (!newEmail) return
-
-			try {
-				const token = localStorage.getItem('token')
-				const response = await fetch(`${API_BASE_URL}/users/me/email`, {
-					method: 'PUT',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ email: newEmail })
-				})
-
-				if (response.ok) {
-					const result = await response.json()
-					updateProfileUI(result)
-					alert('Email успешно обновлен')
-				} else {
-					throw new Error('Ошибка обновления email')
-				}
-			} catch (error) {
-				console.error('Ошибка:', error)
-				alert('Не удалось обновить email')
-			}
-		})
-
-		const passwordButton = document.querySelector('.password-info button')
-		passwordButton.addEventListener('click', async () => {
-			const oldPassword = prompt('Введите текущий пароль:')
-			if (!oldPassword) return
-			
-			const newPassword = prompt('Введите новый пароль:')
-			if (!newPassword) return
-
-			try {
-				const token = localStorage.getItem('token')
-				const response = await fetch(`${API_BASE_URL}/users/me/password`, {
-					method: 'PUT',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						old_password: oldPassword,
-						new_password: newPassword
-					})
-				})
-
-				if (response.ok) {
-					alert('Пароль успешно обновлен')
-				} else {
-					throw new Error('Ошибка обновления пароля')
-				}
-			} catch (error) {
-				console.error('Ошибка:', error)
-				alert('Не удалось обновить пароль')
-			}
-		})
 	}
 })
+
+//отображение данных пользователя
+function displayUserProfile(userData) {
+	const profileHeader = document.querySelector('.profile-header')
+	const profileMain = document.querySelector('.profile-main')
+
+	// Обновление заголовка профиля
+	profileHeader.querySelector('h2').textContent = userData.username
+	profileHeader.querySelector('h4').textContent = userData.email
+
+	// Обновление основного контента профиля
+	profileMain.querySelector('.account-info p').textContent = userData.username
+
+	// Обновление аватара
+	profileMain.querySelector('.avatar-info img').src = userData.avatar
+}
