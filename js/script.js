@@ -1,20 +1,18 @@
-// Жёстко задаём базовый URL API
-const API_BASE_URL = 'https://5.129.207.58'
+// Базовый URL API через Nginx
+const API_BASE_URL = 'https://chupep.ru/api'
+
 const tabs = document.querySelectorAll('.tab-btn')
 const contents = document.querySelectorAll('.tab-content')
 
 tabs.forEach(btn => {
 	btn.addEventListener('click', () => {
 		const target = btn.dataset.target
-		// Снимаем active со всех кнопок и секций
 		tabs.forEach(b => b.classList.remove('active'))
 		contents.forEach(c => c.classList.remove('active'))
-		// Вешаем active на нажатую кнопку и её контент
 		btn.classList.add('active')
 		document.getElementById(target).classList.add('active')
 	})
 })
-
 
 document.addEventListener('DOMContentLoaded', function () {
 	const loginBtn = document.getElementById('loginBtn')
@@ -22,6 +20,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	const loginMenu = document.getElementById('loginMenu')
 	const registrationMenu = document.getElementById('registrationMenu')
 	const closeButtons = document.querySelectorAll('.closeBtn')
+
+	// Базовые настройки для fetch запросов
+	const baseRequestOptions = {
+		credentials: 'include',
+		headers: {
+			Accept: 'application/json',
+		},
+	}
 
 	function openMenu(menu) {
 		closeAllMenus()
@@ -37,209 +43,236 @@ document.addEventListener('DOMContentLoaded', function () {
 		registrationMenu.classList.remove('active')
 	}
 
-	loginBtn.addEventListener('click', function () {
-		openMenu(loginMenu)
-	})
-
-	registerBtn.addEventListener('click', function () {
-		openMenu(registrationMenu)
-	})
+	// Обработчики кнопок
+	loginBtn?.addEventListener('click', () => openMenu(loginMenu))
+	registerBtn?.addEventListener('click', () => openMenu(registrationMenu))
 
 	closeButtons.forEach(button => {
-		button.addEventListener('click', function () {
+		button.addEventListener('click', () => {
 			closeMenu(button.closest('.modal'))
 		})
 	})
 
-	window.addEventListener('click', function (event) {
+	window.addEventListener('click', event => {
 		if (event.target.classList.contains('modal')) {
 			closeMenu(event.target)
 		}
 	})
 
 	// Логика показа/скрытия пароля
-	const toggleButtons = document.querySelectorAll('.togglePassword');
+	const toggleButtons = document.querySelectorAll('.togglePassword')
 	toggleButtons.forEach(btn => {
-		btn.addEventListener('click', function() {
-			const targetId = this.getAttribute('data-target');
-			const input = document.getElementById(targetId);
+		btn.addEventListener('click', function () {
+			const targetId = this.getAttribute('data-target')
+			const input = document.getElementById(targetId)
 			if (input.type === 'password') {
-				input.type = 'text';
-				this.textContent = 'Скрыть';
+				input.type = 'text'
+				this.textContent = 'Скрыть'
 			} else {
-				input.type = 'password';
-				this.textContent = 'Показать';
+				input.type = 'password'
+				this.textContent = 'Показать'
 			}
-		});
-	});
+		})
+	})
 
-	// Логика открытия/закрытия мобильного меню
-	const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-	const mobileMenu = document.getElementById('mobileMenu');
-	mobileMenuBtn.addEventListener('click', function() {
-		mobileMenu.classList.toggle('active');
-	});
+	// Мобильное меню
+	const mobileMenuBtn = document.getElementById('mobileMenuBtn')
+	const mobileMenu = document.getElementById('mobileMenu')
+	mobileMenuBtn?.addEventListener('click', () => {
+		mobileMenu.classList.toggle('active')
+	})
 
-	// Обработчики для кнопок мобильного меню
-	document.getElementById('registerBtnMobile').addEventListener('click', function() {
-		openMenu(registrationMenu);
-		mobileMenu.classList.remove('active');
-	});
-	document.getElementById('loginBtnMobile').addEventListener('click', function() {
-		openMenu(loginMenu);
-		mobileMenu.classList.remove('active');
-	});
+	// Мобильные кнопки авторизации
+	document
+		.getElementById('registerBtnMobile')
+		?.addEventListener('click', () => {
+			openMenu(registrationMenu)
+			mobileMenu.classList.remove('active')
+		})
 
-	// Интеграция API: регистрация
-	const registrationForm = document.getElementById('registrationForm');
+	document.getElementById('loginBtnMobile')?.addEventListener('click', () => {
+		openMenu(loginMenu)
+		mobileMenu.classList.remove('active')
+	})
+
+	// Регистрация
+	const registrationForm = document.getElementById('registrationForm')
 	if (registrationForm) {
-		registrationForm.addEventListener('submit', async function(e) {
-			e.preventDefault();
-			const username = document.getElementById('regUsername').value;
-			const email = document.getElementById('regEmail').value;
-			const password = document.getElementById('regPassword').value;
-			const confirmPassword = document.getElementById('regConfirmPassword').value;
-			
+		registrationForm.addEventListener('submit', async function (e) {
+			e.preventDefault()
+			const username = document.getElementById('regUsername').value
+			const email = document.getElementById('regEmail').value
+			const password = document.getElementById('regPassword').value
+			const confirmPassword =
+				document.getElementById('regConfirmPassword').value
+
 			if (password !== confirmPassword) {
-				alert('Пароли не совпадают');
-				return;
+				alert('Пароли не совпадают')
+				return
 			}
 
 			try {
 				const res = await fetch(`${API_BASE_URL}/new_user`, {
-					method: 'POST',
-					headers: { 
-						'Content-Type': 'application/json',
-						'Accept': 'application/json' 
-					},
-					body: JSON.stringify({ 
-						username: username,
-						email: email, 
-						password: password 
-					})
-				});
-				
-				const text = await res.text();
-				console.log('Raw response:', text);
-				console.log('Response status:', res.status);
-				
-				let result;
-				try { 
-					result = text ? JSON.parse(text) : {}; 
-					console.log('Parsed response:', result);
-				} catch (e) { 
-					console.error('JSON parse error:', e);
-					result = { detail: text } 
-				}
-				
-				if (res.ok) {
-					alert(`Пользователь ${result.username} успешно зарегистрирован`);
-					closeAllMenus();
-					openMenu(loginMenu);
-				} else {
-					const errorMessage = result.detail || text || 'Неизвестная ошибка';
-					console.error('Registration error:', errorMessage);
-					alert(`Ошибка регистрации ${res.status}: ${errorMessage}`);
-				}
-			} catch (err) {
-				console.error('Registration error:', err);
-				alert(`Ошибка регистрации: ${err.message}`);
-			}
-		});
-	}
-
-	// Интеграция API: авторизация
-	const loginForm = document.getElementById('loginForm');
-	if (loginForm) {
-		loginForm.addEventListener('submit', async function(e) {
-			e.preventDefault();
-			const username = document.getElementById('loginUsername').value;
-			const password = document.getElementById('loginPassword').value;
-			try {
-				const res = await fetch(`${API_BASE_URL}/token`, {
+					...baseRequestOptions,
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						'Accept': 'application/json'
+						...baseRequestOptions.headers,
+						'Content-Type': 'application/json',
 					},
-					body: new URLSearchParams({ username: username, password: password })
-				});
-				// Безопасный разбор ответа
-				const text = await res.text();
-				let result;
+					body: JSON.stringify({
+						username,
+						email,
+						password,
+					}),
+				})
+
+				const text = await res.text()
+				console.log('Raw response:', text)
+
+				let result
 				try {
-					result = text ? JSON.parse(text) : {};
-				} catch (err) {
-					console.warn('Failed to parse JSON for login:', err);
-					result = { detail: text };
+					result = text ? JSON.parse(text) : {}
+				} catch (e) {
+					console.error('JSON parse error:', e)
+					result = { detail: text }
 				}
-				console.log('Login response:', res.status, result);
+
 				if (res.ok) {
-					localStorage.setItem('token', result.access_token);
-					alert('Вход выполнен');
-					closeAllMenus();
-					window.location.href = 'profile.html';
+					alert(`Пользователь ${result.username} успешно зарегистрирован`)
+					closeAllMenus()
+					openMenu(loginMenu)
 				} else {
-					alert(`Ошибка авторизации ${res.status}: ${result.detail || text}`);
+					const errorMessage = result.detail || text || 'Неизвестная ошибка'
+					alert(`Ошибка регистрации: ${errorMessage}`)
 				}
 			} catch (err) {
-				console.error('Ошибка авторизации:', err);
-				alert(`Ошибка авторизации: ${err.message}`);
+				console.error('Registration error:', err)
+				alert(`Ошибка регистрации: ${err.message}`)
 			}
-		});
+		})
 	}
 
-	// Загрузка профиля на странице profile.html
+	// Авторизация
+	const loginForm = document.getElementById('loginForm')
+	if (loginForm) {
+		loginForm.addEventListener('submit', async function (e) {
+			e.preventDefault()
+			const username = document.getElementById('loginUsername').value
+			const password = document.getElementById('loginPassword').value
+
+			try {
+				const res = await fetch(`${API_BASE_URL}/token`, {
+					...baseRequestOptions,
+					method: 'POST',
+					headers: {
+						...baseRequestOptions.headers,
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams({
+						username,
+						password,
+					}),
+				})
+
+				const text = await res.text()
+				let result
+				try {
+					result = text ? JSON.parse(text) : {}
+				} catch (err) {
+					console.warn('Failed to parse JSON:', err)
+					result = { detail: text }
+				}
+
+				if (res.ok) {
+					localStorage.setItem('token', result.access_token)
+					alert('Вход выполнен успешно')
+					closeAllMenus()
+					window.location.href = 'profile.html'
+				} else {
+					alert(`Ошибка авторизации: ${result.detail || text}`)
+				}
+			} catch (err) {
+				console.error('Login error:', err)
+				alert(`Ошибка авторизации: ${err.message}`)
+			}
+		})
+	}
+
+	// Загрузка профиля
 	if (window.location.pathname.endsWith('profile.html')) {
-		const token = localStorage.getItem('token');
+		const token = localStorage.getItem('token')
 		if (!token) {
-			alert('Пожалуйста, войдите в систему');
-			window.location.href = 'index.html';
+			alert('Пожалуйста, войдите в систему')
+			window.location.href = 'index.html'
 		} else {
 			fetch(`${API_BASE_URL}/users/me`, {
-				headers: { 'Authorization': 'Bearer ' + token }
+				...baseRequestOptions,
+				headers: {
+					...baseRequestOptions.headers,
+					Authorization: `Bearer ${token}`,
+				},
 			})
-			.then(res => res.json())
-			.then(data => {
-				document.getElementById('profileName').value = data.email;
-				document.getElementById('profileEmail').value = data.email;
-			})
-			.catch(err => console.error('Ошибка загрузки профиля:', err));
+				.then(res => {
+					if (!res.ok) throw new Error('Ошибка загрузки профиля')
+					return res.json()
+				})
+				.then(data => {
+					document.getElementById('profileName').value = data.email
+					document.getElementById('profileEmail').value = data.email
+				})
+				.catch(err => {
+					console.error('Profile load error:', err)
+					alert('Ошибка загрузки профиля')
+					localStorage.removeItem('token')
+					window.location.href = 'index.html'
+				})
 		}
 	}
 
-	// Обновление профиля (PUT /users/me)
-	const profileForm = document.getElementById('profileForm');
+	// Обновление профиля
+	const profileForm = document.getElementById('profileForm')
 	if (profileForm) {
-		profileForm.addEventListener('submit', async function(e) {
-			e.preventDefault();
-			const email = document.getElementById('profileEmail').value;
-			const password = document.getElementById('profilePassword').value;
-			const confirm = document.getElementById('profileConfirmPassword').value;
-			if (password !== confirm) { alert('Пароли не совпадают'); return; }
+		profileForm.addEventListener('submit', async function (e) {
+			e.preventDefault()
+			const email = document.getElementById('profileEmail').value
+			const password = document.getElementById('profilePassword').value
+			const confirm = document.getElementById('profileConfirmPassword').value
+
+			if (password !== confirm) {
+				alert('Пароли не совпадают')
+				return
+			}
+
 			try {
-				const token = localStorage.getItem('token');
+				const token = localStorage.getItem('token')
 				const res = await fetch(`${API_BASE_URL}/users/me`, {
+					...baseRequestOptions,
 					method: 'PUT',
 					headers: {
+						...baseRequestOptions.headers,
 						'Content-Type': 'application/json',
-						'Authorization': 'Bearer ' + token
+						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify({ email: email, password: password })
-				});
-				const text = await res.text();
-				let result;
-				try { result = text ? JSON.parse(text) : {}; } catch (e) { result = { detail: text } }
-				console.log('Update profile:', res.status, result);
+					body: JSON.stringify({ email, password }),
+				})
+
+				const text = await res.text()
+				let result
+				try {
+					result = text ? JSON.parse(text) : {}
+				} catch (e) {
+					result = { detail: text }
+				}
+
 				if (res.ok) {
-					alert('Профиль обновлён');
+					alert('Профиль успешно обновлен')
 				} else {
-					alert(`Ошибка обновления ${res.status}: ${result.detail || text}`);
+					alert(`Ошибка обновления профиля: ${result.detail || text}`)
 				}
 			} catch (err) {
-				console.error('Ошибка обновления профиля:', err);
-				alert('Ошибка при обновлении профиля');
+				console.error('Profile update error:', err)
+				alert('Ошибка при обновлении профиля')
 			}
-		});
+		})
 	}
 })
