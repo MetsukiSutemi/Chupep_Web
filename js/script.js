@@ -254,12 +254,21 @@ async function displayUserProfile() {
 		const accountInfo = document.querySelector('.account-info-item p')
 		if (accountInfo) {
 			accountInfo.textContent = userData.email || 'Email не указан'
+		} else {
+			alert('Не найден элемент для отображения email')
 		}
 
 		const usernameElement = document.querySelector('.profile-username')
 		if (usernameElement) {
 			usernameElement.textContent = userData.username || 'Пользователь'
+		} else {
+			alert('Не найден элемент для отображения имени пользователя')
 		}
+
+		// Выводим полученные данные в alert для отладки
+		alert(`Получены данные пользователя:
+Email: ${userData.email || 'не указан'}
+Имя пользователя: ${userData.username || 'не указано'}`)
 
 	} catch (err) {
 		alert('Ошибка при отображении профиля: ' + err.message)
