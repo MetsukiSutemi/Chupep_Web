@@ -199,33 +199,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	// Загрузка профиля
-	if (window.location.pathname.endsWith('profile.html')) {
-		const token = localStorage.getItem('token')
-		if (!token) {
-			alert('Пожалуйста, войдите в систему')
-			window.location.href = 'index.html'
+	if (window.location.pathname.includes('/profile/')) {
+		console.log('Находимся на странице профиля');
+		const token = localStorage.getItem('token');
+		console.log('Токен:', token);
+		
+		if (token) {
+			console.log('Начинаем загрузку профиля');
+			fetchUserProfile();
+			initializeProfileEditors();
 		} else {
-			fetch(`${API_BASE_URL}/users/me`, {
-				...baseRequestOptions,
-				headers: {
-					...baseRequestOptions.headers,
-					Authorization: `Bearer ${token}`,
-				},
-			})
-				.then(res => {
-					if (!res.ok) throw new Error('Ошибка загрузки профиля')
-					return res.json()
-				})
-				.then(data => {
-					document.getElementById('profileName').value = data.email
-					document.getElementById('profileEmail').value = data.email
-				})
-				.catch(err => {
-					console.error('Profile load error:', err)
-					alert('Ошибка загрузки профиля')
-					localStorage.removeItem('token')
-					window.location.href = 'index.html'
-				})
+			console.log('Токен не найден, перенаправляем на главную');
+			window.location.href = '/';
 		}
 	}
 
@@ -279,33 +264,38 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Функция для получения данных пользователя
 	async function fetchUserProfile() {
 		try {
-			const token = localStorage.getItem('token')
+			const token = localStorage.getItem('token');
 			if (!token) {
-				window.location.href = '/'; // Редирект на главную если нет токена
-				return
+				console.log('Токен не найден в fetchUserProfile');
+				window.location.href = '/';
+				return;
 			}
 
+			console.log('Отправляем запрос на получение данных пользователя');
 			const response = await fetch(`${API_BASE_URL}/users/me`, {
 				credentials: 'include',
 				headers: {
 					'Authorization': `Bearer ${token}`,
 					'Accept': 'application/json'
 				}
-			})
+			});
 
+			console.log('Ответ сервера:', response.status);
 			if (response.ok) {
-				const userData = await response.json()
-				updateProfileUI(userData)
+				const userData = await response.json();
+				console.log('Получены данные пользователя:', userData);
+				updateProfileUI(userData);
 			} else {
 				if (response.status === 401) {
-					localStorage.removeItem('token')
-					window.location.href = '/'
+					console.log('Ошибка 401: неавторизован');
+					localStorage.removeItem('token');
+					window.location.href = '/';
 				}
-				throw new Error('Ошибка получения данных профиля')
+				throw new Error('Ошибка получения данных профиля');
 			}
 		} catch (error) {
-			console.error('Ошибка:', error)
-			alert('Не удалось загрузить данные профиля')
+			console.error('Ошибка в fetchUserProfile:', error);
+			alert('Не удалось загрузить данные профиля');
 		}
 	}
 
@@ -452,19 +442,4 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 	}
-
-	// Вызываем функции при загрузке страницы
-	document.addEventListener('DOMContentLoaded', () => {
-		// Проверяем, находимся ли мы на странице профиля
-		if (window.location.pathname.includes('profile')) {
-			const token = localStorage.getItem('token');
-			if (token) {
-				fetchUserProfile();
-				initializeProfileEditors();
-			} else {
-				// Если нет токена, перенаправляем на главную
-				window.location.href = '/';
-			}
-		}
-	});
 })
