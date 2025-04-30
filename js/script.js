@@ -220,32 +220,60 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 })
 
-//отображение данных пользователя на странице профиля при отображении страницы
-function displayUserProfile(userData) {
-	const profileHeader = document.querySelector('.profile-header')
-	const profileMain = document.querySelector('.profile-main')
+//отображение данных пользователя на странице профиля при обновлении страницы
+async function displayUserProfile() {
+	try {
+		const token = localStorage.getItem('token')
+		if (!token) {
+			window.location.href = '/'
+			return
+		}
 
-	// Обновление заголовка профиля
-	if (profileHeader) {
-		const username = profileHeader.querySelector('h2')
-		const email = profileHeader.querySelector('h4')
-		if (username) username.textContent = userData.username || 'Пользователь'
-		if (email) email.textContent = userData.email || 'Email не указан'
-	}
+		const res = await fetch(`${API_BASE_URL}/me`, {
+			...baseRequestOptions,
+			headers: {
+				...baseRequestOptions.headers,
+				'Authorization': `Bearer ${token}`
+			}
+		})
 
-	// Обновление основного контента профиля
-	if (profileMain) {
-		const accountInfo = profileMain.querySelector('.account-info p')
-		if (accountInfo) accountInfo.textContent = userData.username || 'Пользователь'
+		if (!res.ok) {
+			throw new Error('Ошибка получения данных профиля')
+		}
 
-		// Обновление аватара
-		const avatarImg = profileMain.querySelector('.avatar-info img')
+		const userData = await res.json()
+
+		// Обновляем информацию в профиле
+		const usernameElement = document.querySelector('.account-info-item p')
+		const emailElement = document.querySelector('.account-info-item:nth-child(2) p')
+		
+		if (usernameElement) {
+			usernameElement.textContent = userData.username || 'Не указано'
+		}
+		
+		if (emailElement) {
+			emailElement.textContent = userData.email || 'Email не указан'
+		}
+
+		// Обновляем аватар
+		const avatarImg = document.querySelector('.avatar-info img')
 		if (avatarImg) {
-			avatarImg.src = userData.avatar || 'images/default-avatar.png' // Исправлен путь к дефолтной аватарке
+			avatarImg.src = userData.avatar || 'images/default-avatar.png'
 			avatarImg.alt = `Аватар пользователя ${userData.username}`
 		}
+
+	} catch (err) {
+		console.error('Ошибка при загрузке профиля:', err)
+		alert('Не удалось загрузить данные профиля')
 	}
 }
+
+// Вызываем функцию при загрузке страницы профиля
+if (window.location.pathname.includes('profile')) {
+	displayUserProfile()
+}
+
+
 
 //изменение емейла
 async function updateEmail(newEmail) {
