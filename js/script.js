@@ -230,64 +230,82 @@ async function displayUserProfile() {
 		}
 
 		const res = await fetch(`${API_BASE_URL}/users/me`, {
+			method: 'GET',
 			credentials: 'include', 
 			headers: {
 				'Accept': 'application/json',
+				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${token}`
 			}
 		})
 
-		const text = await res.text()
-		let userData
-		try {
-			userData = text ? JSON.parse(text) : {}
-		} catch (err) {
-			alert('Ошибка парсинга JSON: ' + err)
-			userData = { detail: text }
+		if (!res.ok) {
+			if (res.status === 401) {
+				localStorage.removeItem('token')
+				window.location.href = '/'
+				return
+			}
+			throw new Error(`HTTP error! status: ${res.status}`)
 		}
 
-		if (!res.ok) {
-			throw new Error(`Ошибка получения данных профиля: ${userData.detail || text}`)
-		}
+		const userData = await res.json()
 
 		// Обновляем информацию на странице
 		const accountInfo = document.querySelector('.account-info-item p')
 		if (accountInfo) {
 			accountInfo.textContent = userData.email || 'Email не указан'
-		} else {
-			alert('Не найден элемент для отображения email')
 		}
 
-		const usernameElement = document.querySelector('.profile-username')
+		const usernameElement = document.querySelector('.profile-header-text h2')
 		if (usernameElement) {
-			usernameElement.textContent = userData.username || 'Пользователь'
-		} else {
-			alert('Не найден элемент для отображения имени пользователя')
+			usernameElement.textContent = userData.name || userData.username
 		}
 
-		// Выводим полученные данные в alert для отладки
-		alert(`Получены данные пользователя:
-Email: ${userData.email || 'не указан'}
-Имя пользователя: ${userData.username || 'не указано'}`)
+		const userHandleElement = document.querySelector('.profile-header-text h4')
+		if (userHandleElement) {
+			userHandleElement.textContent = `@${userData.username}`
+		}
+
+		// Обновляем аватар если есть
+		if (userData.avatar) {
+			const avatarImg = document.getElementById('avatarImg')
+			if (avatarImg) {
+				avatarImg.src = `${API_BASE_URL}/users/me/get_avatar`
+				// Добавляем заголовки авторизации для загрузки аватара
+				avatarImg.onerror = () => {
+					fetch(`${API_BASE_URL}/users/me/get_avatar`, {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+					.then(response => response.blob())
+					.then(blob => {
+						avatarImg.src = URL.createObjectURL(blob)
+					})
+					.catch(error => {
+						console.error('Ошибка загрузки аватара:', error)
+						avatarImg.src = '../image/default-avatar.png'
+					})
+				}
+			}
+		}
 
 	} catch (err) {
-		alert('Ошибка при отображении профиля: ' + err.message)
+		console.error('Ошибка при отображении профиля:', err)
 		if (err.message.includes('Failed to fetch')) {
-			alert('Ошибка соединения с сервером')
+			alert('Ошибка соединения с сервером. Проверьте подключение к интернету.')
 		} else {
-			alert(err.message)
+			alert(`Ошибка при загрузке профиля: ${err.message}`)
 		}
-		window.location.href = '/'
 	}
 }
 
-
-// Вызываем функцию при загрузке страницы профиля
-if (window.location.pathname.includes('profile')) {
-	displayUserProfile()
-}
-
-
+// Вызываем функцию при загрузке страницы только если мы на странице профиля
+document.addEventListener('DOMContentLoaded', () => {
+	if (window.location.pathname.includes('profile')) {
+		displayUserProfile()
+	}
+})
 
 //изменение емейла
 async function updateEmail(newEmail) {
