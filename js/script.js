@@ -238,12 +238,10 @@ function displayUserProfile(userData) {
 		const accountInfo = profileMain.querySelector('.account-info p')
 		if (accountInfo) accountInfo.textContent = userData.username || 'Пользователь'
 
-		// Обновление аватара с добавлением случайного параметра для предотвращения кэширования
+		// Обновление аватара
 		const avatarImg = profileMain.querySelector('.avatar-info img')
 		if (avatarImg) {
-			const timestamp = new Date().getTime()
-			const avatarUrl = userData.avatar || '/images/default-avatar.png'
-			avatarImg.src = `${avatarUrl}?t=${timestamp}`
+			avatarImg.src = userData.avatar || 'images/default-avatar.png' // Исправлен путь к дефолтной аватарке
 			avatarImg.alt = `Аватар пользователя ${userData.username}`
 		}
 	}
