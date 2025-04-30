@@ -309,25 +309,50 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// Функция обновления UI профиля
+	// Функция для загрузки аватара
+	async function loadAvatar() {
+		const token = localStorage.getItem('token');
+		if (!token) return;
+
+		try {
+			const response = await fetch(`${API_BASE_URL}/users/me/get_avatar`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			if (response.ok) {
+				const blob = await response.blob();
+				const avatarImg = document.getElementById('avatarImg');
+				avatarImg.src = URL.createObjectURL(blob);
+			} else {
+				throw new Error('Ошибка загрузки аватара');
+			}
+		} catch (error) {
+			console.error('Ошибка загрузки аватара:', error);
+			const avatarImg = document.getElementById('avatarImg');
+			avatarImg.src = '../image/default-avatar.png';
+		}
+	}
+
+	// Обновляем функцию updateProfileUI
 	function updateProfileUI(userData) {
-		// Обновляем аватар
-		const avatarImg = document.getElementById('avatarImg')
+		// Загружаем аватар
 		if (userData.avatar) {
-			avatarImg.src = `${API_BASE_URL}/users/me/get_avatar`
+			loadAvatar();
 		}
 
 		// Обновляем имя пользователя
-		const usernameElement = document.querySelector('.profile-header-text h2')
-		usernameElement.textContent = userData.name || userData.username
+		const usernameElement = document.querySelector('.profile-header-text h2');
+		usernameElement.textContent = userData.name || userData.username;
 
 		// Обновляем @username
-		const userHandleElement = document.querySelector('.profile-header-text h4')
-		userHandleElement.textContent = `@${userData.username}`
+		const userHandleElement = document.querySelector('.profile-header-text h4');
+		userHandleElement.textContent = `@${userData.username}`;
 
 		// Обновляем email
-		const emailElement = document.querySelector('.account-info-item p')
-		emailElement.textContent = userData.email
+		const emailElement = document.querySelector('.account-info-item p');
+		emailElement.textContent = userData.email;
 	}
 
 	// Добавляем обработчики для изменения данных
@@ -429,6 +454,17 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	// Вызываем функции при загрузке страницы
-	fetchUserProfile()
-	initializeProfileEditors()
+	document.addEventListener('DOMContentLoaded', () => {
+		// Проверяем, находимся ли мы на странице профиля
+		if (window.location.pathname.includes('profile')) {
+			const token = localStorage.getItem('token');
+			if (token) {
+				fetchUserProfile();
+				initializeProfileEditors();
+			} else {
+				// Если нет токена, перенаправляем на главную
+				window.location.href = '/';
+			}
+		}
+	});
 })
