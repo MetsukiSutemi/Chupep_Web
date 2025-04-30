@@ -237,11 +237,18 @@ async function displayUserProfile() {
 			}
 		})
 
-		if (!res.ok) {
-			throw new Error('Ошибка получения данных профиля')
+		const text = await res.text()
+		let userData
+		try {
+			userData = text ? JSON.parse(text) : {}
+		} catch (err) {
+			console.warn('Ошибка парсинга JSON:', err)
+			userData = { detail: text }
 		}
 
-		const userData = await res.json()
+		if (!res.ok) {
+			throw new Error(`Ошибка получения данных профиля: ${userData.detail || text}`)
+		}
 
 		// Обновляем информацию на странице
 		const accountInfo = document.querySelector('.account-info-item p')
@@ -256,10 +263,14 @@ async function displayUserProfile() {
 
 	} catch (err) {
 		console.error('Ошибка при отображении профиля:', err)
-		alert('Не удалось загрузить данные профиля')
+		if (err.message.includes('Failed to fetch')) {
+			alert('Ошибка соединения с сервером')
+		} else {
+			alert(err.message)
+		}
+		window.location.href = '/'
 	}
 }
-
 
 
 // Вызываем функцию при загрузке страницы профиля
