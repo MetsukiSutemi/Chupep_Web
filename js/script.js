@@ -229,7 +229,7 @@ async function displayUserProfile() {
 			return
 		}
 
-		const res = await fetch(`${API_BASE_URL}/me`, {	
+		const res = await fetch(`${API_BASE_URL}/me`, {
 			...baseRequestOptions,
 			headers: {
 				...baseRequestOptions.headers,
@@ -243,34 +243,23 @@ async function displayUserProfile() {
 
 		const userData = await res.json()
 
-		// Обновляем информацию в профиле
-		const usernameElement = document.querySelector('.account-info-item p')
-		const nameElement = document.querySelector('.account-info-item:nth-child(2) p')
-		const emailElement = document.querySelector('.account-info-item:nth-child(3) p')
-		
+		// Обновляем информацию на странице
+		const accountInfo = document.querySelector('.account-info-item p')
+		if (accountInfo) {
+			accountInfo.textContent = userData.email || 'Email не указан'
+		}
+
+		const usernameElement = document.querySelector('.profile-username')
 		if (usernameElement) {
-			usernameElement.textContent = userData.username || 'Не указано'
+			usernameElement.textContent = userData.username || 'Пользователь'
 		}
 
-		if (nameElement) {
-			nameElement.textContent = userData.name || 'Не указано'
-		}
-
-		if (emailElement) {
-			emailElement.textContent = userData.email || 'Email не указан'
-		}
-
-		// Обновляем аватар
-		const avatarImg = document.querySelector('.avatar-info img')
-		if (avatarImg) {
-			avatarImg.src = userData.avatar || 'images/default-avatar.png'
-			avatarImg.alt = `Аватар пользователя ${userData.username}`
-		}
 	} catch (err) {
-		console.error('Ошибка при загрузке профиля:', err)
+		console.error('Ошибка при отображении профиля:', err)
 		alert('Не удалось загрузить данные профиля')
 	}
 }
+
 
 
 // Вызываем функцию при загрузке страницы профиля
