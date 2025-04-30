@@ -220,18 +220,53 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 })
 
-//отображение данных пользователя
+//отображение данных пользователя на странице профиля при отображении страницы
 function displayUserProfile(userData) {
 	const profileHeader = document.querySelector('.profile-header')
 	const profileMain = document.querySelector('.profile-main')
 
 	// Обновление заголовка профиля
-	profileHeader.querySelector('h2').textContent = userData.username
-	profileHeader.querySelector('h4').textContent = userData.email
+	if (profileHeader) {
+		const username = profileHeader.querySelector('h2')
+		const email = profileHeader.querySelector('h4')
+		if (username) username.textContent = userData.username || 'Пользователь'
+		if (email) email.textContent = userData.email || 'Email не указан'
+	}
 
 	// Обновление основного контента профиля
-	profileMain.querySelector('.account-info p').textContent = userData.username
+	if (profileMain) {
+		const accountInfo = profileMain.querySelector('.account-info p')
+		if (accountInfo) accountInfo.textContent = userData.username || 'Пользователь'
 
-	// Обновление аватара
-	profileMain.querySelector('.avatar-info img').src = userData.avatar
+		// Обновление аватара
+		const avatarImg = profileMain.querySelector('.avatar-info img')
+		if (avatarImg) {
+			avatarImg.src = userData.avatar || '/images/default-avatar.png'
+			avatarImg.alt = `Аватар пользователя ${userData.username}`
+		}
+	}
 }
+
+//изменение емейла
+async function updateEmail(newEmail) {
+	const token = localStorage.getItem('token')
+	if (!token) {
+		window.location.href = '/'
+	}
+
+	try {
+		const res = await fetch(`${API_BASE_URL}/me/email`, {
+			...baseRequestOptions,
+			method: 'POST',
+			headers: {
+				...baseRequestOptions.headers,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ email: newEmail }),
+		})
+	} catch (err) {
+		console.error('Error updating email:', err)
+		alert('Ошибка при изменении email')
+	}
+}
+
