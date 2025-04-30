@@ -230,9 +230,9 @@ async function displayUserProfile() {
 		}
 
 		const res = await fetch(`${API_BASE_URL}/me`, {
-			...baseRequestOptions,
+			credentials: 'include',
 			headers: {
-				...baseRequestOptions.headers,
+				'Accept': 'application/json',
 				'Authorization': `Bearer ${token}`
 			}
 		})
