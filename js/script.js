@@ -229,7 +229,7 @@ async function displayUserProfile() {
 			return
 		}
 
-		const res = await fetch(`${API_BASE_URL}/me`, {
+		const res = await fetch(`${API_BASE_URL}/me`, {	
 			...baseRequestOptions,
 			headers: {
 				...baseRequestOptions.headers,
@@ -245,12 +245,17 @@ async function displayUserProfile() {
 
 		// Обновляем информацию в профиле
 		const usernameElement = document.querySelector('.account-info-item p')
-		const emailElement = document.querySelector('.account-info-item:nth-child(2) p')
+		const nameElement = document.querySelector('.account-info-item:nth-child(2) p')
+		const emailElement = document.querySelector('.account-info-item:nth-child(3) p')
 		
 		if (usernameElement) {
 			usernameElement.textContent = userData.username || 'Не указано'
 		}
-		
+
+		if (nameElement) {
+			nameElement.textContent = userData.name || 'Не указано'
+		}
+
 		if (emailElement) {
 			emailElement.textContent = userData.email || 'Email не указан'
 		}
@@ -261,12 +266,12 @@ async function displayUserProfile() {
 			avatarImg.src = userData.avatar || 'images/default-avatar.png'
 			avatarImg.alt = `Аватар пользователя ${userData.username}`
 		}
-
 	} catch (err) {
 		console.error('Ошибка при загрузке профиля:', err)
 		alert('Не удалось загрузить данные профиля')
 	}
 }
+
 
 // Вызываем функцию при загрузке страницы профиля
 if (window.location.pathname.includes('profile')) {
