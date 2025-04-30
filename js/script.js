@@ -275,4 +275,160 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 	}
+
+	// Функция для получения данных пользователя
+	async function fetchUserProfile() {
+		try {
+			const token = localStorage.getItem('token')
+			if (!token) {
+				window.location.href = '/'; // Редирект на главную если нет токена
+				return
+			}
+
+			const response = await fetch(`${API_BASE_URL}/users/me`, {
+				credentials: 'include',
+				headers: {
+					'Authorization': `Bearer ${token}`,
+					'Accept': 'application/json'
+				}
+			})
+
+			if (response.ok) {
+				const userData = await response.json()
+				updateProfileUI(userData)
+			} else {
+				if (response.status === 401) {
+					localStorage.removeItem('token')
+					window.location.href = '/'
+				}
+				throw new Error('Ошибка получения данных профиля')
+			}
+		} catch (error) {
+			console.error('Ошибка:', error)
+			alert('Не удалось загрузить данные профиля')
+		}
+	}
+
+	// Функция обновления UI профиля
+	function updateProfileUI(userData) {
+		// Обновляем аватар
+		const avatarImg = document.getElementById('avatarImg')
+		if (userData.avatar) {
+			avatarImg.src = `${API_BASE_URL}/users/me/get_avatar`
+		}
+
+		// Обновляем имя пользователя
+		const usernameElement = document.querySelector('.profile-header-text h2')
+		usernameElement.textContent = userData.name || userData.username
+
+		// Обновляем @username
+		const userHandleElement = document.querySelector('.profile-header-text h4')
+		userHandleElement.textContent = `@${userData.username}`
+
+		// Обновляем email
+		const emailElement = document.querySelector('.account-info-item p')
+		emailElement.textContent = userData.email
+	}
+
+	// Добавляем обработчики для изменения данных
+	function initializeProfileEditors() {
+		// Обработчик изменения аватара
+		const avatarInput = document.getElementById('avatarInput')
+		avatarInput.addEventListener('change', async (e) => {
+			const file = e.target.files[0]
+			if (!file) return
+
+			const formData = new FormData()
+			formData.append('file', file)
+
+			try {
+				const token = localStorage.getItem('token')
+				const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
+					method: 'PUT',
+					headers: {
+						'Authorization': `Bearer ${token}`
+					},
+					body: formData
+				})
+
+				if (response.ok) {
+					const result = await response.json()
+					updateProfileUI(result)
+					alert('Аватар успешно обновлен')
+				} else {
+					throw new Error('Ошибка обновления аватара')
+				}
+			} catch (error) {
+				console.error('Ошибка:', error)
+				alert('Не удалось обновить аватар')
+			}
+		})
+
+		// Обработчики кнопок изменения
+		const emailButton = document.querySelector('.account-info-item button')
+		emailButton.addEventListener('click', async () => {
+			const newEmail = prompt('Введите новый email:')
+			if (!newEmail) return
+
+			try {
+				const token = localStorage.getItem('token')
+				const response = await fetch(`${API_BASE_URL}/users/me/email`, {
+					method: 'PUT',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ email: newEmail })
+				})
+
+				if (response.ok) {
+					const result = await response.json()
+					updateProfileUI(result)
+					alert('Email успешно обновлен')
+				} else {
+					throw new Error('Ошибка обновления email')
+				}
+			} catch (error) {
+				console.error('Ошибка:', error)
+				alert('Не удалось обновить email')
+			}
+		})
+
+		const passwordButton = document.querySelector('.password-info button')
+		passwordButton.addEventListener('click', async () => {
+			const oldPassword = prompt('Введите текущий пароль:')
+			if (!oldPassword) return
+			
+			const newPassword = prompt('Введите новый пароль:')
+			if (!newPassword) return
+
+			try {
+				const token = localStorage.getItem('token')
+				const response = await fetch(`${API_BASE_URL}/users/me/password`, {
+					method: 'PUT',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						old_password: oldPassword,
+						new_password: newPassword
+					})
+				})
+
+				if (response.ok) {
+					alert('Пароль успешно обновлен')
+				} else {
+					throw new Error('Ошибка обновления пароля')
+				}
+			} catch (error) {
+				console.error('Ошибка:', error)
+				alert('Не удалось обновить пароль')
+			}
+		})
+	}
+
+	// Вызываем функции при загрузке страницы
+	fetchUserProfile()
+	initializeProfileEditors()
 })
