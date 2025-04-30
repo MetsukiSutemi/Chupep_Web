@@ -242,7 +242,7 @@ async function displayUserProfile() {
 		try {
 			userData = text ? JSON.parse(text) : {}
 		} catch (err) {
-			console.warn('Ошибка парсинга JSON:', err)
+			alert('Ошибка парсинга JSON: ' + err)
 			userData = { detail: text }
 		}
 
@@ -262,7 +262,7 @@ async function displayUserProfile() {
 		}
 
 	} catch (err) {
-		console.error('Ошибка при отображении профиля:', err)
+		alert('Ошибка при отображении профиля: ' + err.message)
 		if (err.message.includes('Failed to fetch')) {
 			alert('Ошибка соединения с сервером')
 		} else {
