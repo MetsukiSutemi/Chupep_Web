@@ -238,10 +238,12 @@ function displayUserProfile(userData) {
 		const accountInfo = profileMain.querySelector('.account-info p')
 		if (accountInfo) accountInfo.textContent = userData.username || 'Пользователь'
 
-		// Обновление аватара
+		// Обновление аватара с добавлением случайного параметра для предотвращения кэширования
 		const avatarImg = profileMain.querySelector('.avatar-info img')
 		if (avatarImg) {
-			avatarImg.src = userData.avatar || '/images/default-avatar.png'
+			const timestamp = new Date().getTime()
+			const avatarUrl = userData.avatar || '/images/default-avatar.png'
+			avatarImg.src = `${avatarUrl}?t=${timestamp}`
 			avatarImg.alt = `Аватар пользователя ${userData.username}`
 		}
 	}
@@ -268,5 +270,17 @@ async function updateEmail(newEmail) {
 		console.error('Error updating email:', err)
 		alert('Ошибка при изменении email')
 	}
+}
+
+// Обработка выхода из аккаунта
+function logout() {
+	localStorage.removeItem('token')
+	window.location.href = '/'
+}
+
+// Добавляем обработчик для кнопки выхода
+const logoutBtn = document.querySelector('#exit button')
+if (logoutBtn) {
+	logoutBtn.addEventListener('click', logout)
 }
 
