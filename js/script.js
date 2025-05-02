@@ -229,116 +229,40 @@ async function displayUserProfile() {
 			return
 		}
 
-		const res = await fetch(`${API_BASE_URL}/users/me`, {
-			method: 'GET',
-			credentials: 'include', 
+		const response = await fetch(`${API_BASE_URL}/users/me`, {
+			...baseRequestOptions,
 			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
+				...baseRequestOptions.headers,
 				'Authorization': `Bearer ${token}`
 			}
 		})
 
-		if (!res.ok) {
-			if (res.status === 401) {
-				localStorage.removeItem('token')
-				window.location.href = '/'
-				return
-			}
-			throw new Error(`HTTP error! status: ${res.status}`)
+		if (!response.ok) {
+			throw new Error('Не удалось получить данные пользователя')
 		}
 
-		const userData = await res.json()
+		const userData = await response.json()
 
 		// Обновляем информацию на странице
-		const accountInfo = document.querySelector('.account-info-item p')
-		if (accountInfo) {
-			accountInfo.textContent = userData.email || 'Email не указан'
+		const profileName = document.querySelector('.profile-header-text h2')
+		const profileUsername = document.querySelector('.profile-header-text h4')
+		const avatarImg = document.getElementById('avatarImg')
+
+		if (profileName) profileName.textContent = userData.full_name || 'Имя не указано'
+		if (profileUsername) profileUsername.textContent = `@${userData.username}`
+		if (avatarImg && userData.avatar_url) {
+			avatarImg.src = userData.avatar_url
 		}
 
-		const usernameElement = document.querySelector('.profile-header-text h2')
-		if (usernameElement) {
-			usernameElement.textContent = userData.name || userData.username
-		}
-
-		const userHandleElement = document.querySelector('.profile-header-text h4')
-		if (userHandleElement) {
-			userHandleElement.textContent = `@${userData.username}`
-		}
-
-		// Обновляем аватар если есть
-		if (userData.avatar) {
-			const avatarImg = document.getElementById('avatarImg')
-			if (avatarImg) {
-				avatarImg.src = `${API_BASE_URL}/users/me/get_avatar`
-				// Добавляем заголовки авторизации для загрузки аватара
-				avatarImg.onerror = () => {
-					fetch(`${API_BASE_URL}/users/me/get_avatar`, {
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-					.then(response => response.blob())
-					.then(blob => {
-						avatarImg.src = URL.createObjectURL(blob)
-					})
-					.catch(error => {
-						console.error('Ошибка загрузки аватара:', error)
-						avatarImg.src = '../image/default-avatar.png'
-					})
-				}
-			}
-		}
-
-	} catch (err) {
-		console.error('Ошибка при отображении профиля:', err)
-		if (err.message.includes('Failed to fetch')) {
-			alert('Ошибка соединения с сервером. Проверьте подключение к интернету.')
-		} else {
-			alert(`Ошибка при загрузке профиля: ${err.message}`)
-		}
-	}
-}
-
-// Вызываем функцию при загрузке страницы только если мы на странице профиля
-document.addEventListener('DOMContentLoaded', () => {
-	if (window.location.pathname.includes('profile')) {
-		displayUserProfile()
-	}
-})
-
-//изменение емейла
-async function updateEmail(newEmail) {
-	const token = localStorage.getItem('token')
-	if (!token) {
+	} catch (error) {
+		console.error('Ошибка при загрузке профиля:', error)
+		alert('Не удалось загрузить данные профиля')
+		localStorage.removeItem('token')
 		window.location.href = '/'
 	}
-
-	try {
-		const res = await fetch(`${API_BASE_URL}/me/email`, {
-			...baseRequestOptions,
-			method: 'POST',
-			headers: {
-				...baseRequestOptions.headers,
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ email: newEmail }),
-		})
-	} catch (err) {
-		console.error('Error updating email:', err)
-		alert('Ошибка при изменении email')
-	}
 }
 
-// Обработка выхода из аккаунта
-function logout() {
-	localStorage.removeItem('token')
-	window.location.href = '/'
+// Вызываем функцию при загрузке страницы профиля
+if (window.location.pathname.includes('profile')) {
+	displayUserProfile()
 }
-
-// Добавляем обработчик для кнопки выхода
-const logoutBtn = document.querySelector('#exit button')
-if (logoutBtn) {
-	logoutBtn.addEventListener('click', logout)
-}
-
