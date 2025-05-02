@@ -1,5 +1,5 @@
 // Базовый URL API через Nginx
-const API_BASE_URL = 'https://chupep.ru/api'
+const API_BASE_URL = 'https://chupep.ru'
 
 const tabs = document.querySelectorAll('.tab-btn')
 const contents = document.querySelectorAll('.tab-content')
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const token = localStorage.getItem('token');
 		const payload = { key: 'value' };
 
-		fetch(`${API_BASE_URL}/users/me`, {
+		fetch(`${API_BASE_URL}/me`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json', 
