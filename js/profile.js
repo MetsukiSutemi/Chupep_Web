@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+ document.addEventListener('DOMContentLoaded', function () {
     // Вкладки профиля
     const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
@@ -47,4 +47,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Здесь может быть остальная логика профиля (например, загрузка данных пользователя)
-}); 
+});

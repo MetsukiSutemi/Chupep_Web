@@ -1,29 +1,51 @@
+// Базовый URL API через Nginx
+const API_BASE_URL = 'https://chupep.ru/api'
+
 document.addEventListener('DOMContentLoaded', function () {
-    // Мобильное меню для главной страницы
-    const mobileMenuBtnMain = document.getElementById('mobileMenuBtn');
-    const mobileMenuMain = document.getElementById('mobileMenu');
+    // Вкладки профиля (если есть)
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            tabs.forEach(b => b.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(target)?.classList.add('active');
+        });
+    });
 
-    if (mobileMenuBtnMain && mobileMenuMain) {
-        mobileMenuBtnMain.addEventListener('click', (e) => {
+    // Мобильное меню (универсально)
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn') || document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.querySelector('.mobile-menu') || document.getElementById('mobileMenu');
+    const mobileMenuClose = document.querySelector('.mobile-menu-close');
+
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            mobileMenuMain.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
         });
-
-        // Закрытие по клику вне меню
-        document.addEventListener('click', (e) => {
-            if (
-                mobileMenuMain.classList.contains('active') &&
-                !mobileMenuMain.contains(e.target) &&
-                e.target !== mobileMenuBtnMain
-            ) {
-                mobileMenuMain.classList.remove('active');
-            }
+    }
+    if (mobileMenuClose && mobileMenu) {
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
         });
+    }
 
-        // Закрытие по клику на любую кнопку меню
-        mobileMenuMain.querySelectorAll('button').forEach(btn => {
+    // Закрытие меню при клике вне меню
+    document.addEventListener('click', (e) => {
+        if (mobileMenu && mobileMenu.classList.contains('active') &&
+            !mobileMenu.contains(e.target) &&
+            e.target !== mobileMenuBtn) {
+            mobileMenu.classList.remove('active');
+        }
+    });
+
+    // Закрытие мобильного меню по клику на любую кнопку меню
+    if (mobileMenu) {
+        mobileMenu.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {
-                mobileMenuMain.classList.remove('active');
+                mobileMenu.classList.remove('active');
             });
         });
     }
@@ -87,11 +109,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Кнопки регистрации/авторизации в мобильном меню
     document.getElementById('registerBtnMobile')?.addEventListener('click', () => {
         openMenu(registrationMenu);
-        mobileMenuMain.classList.remove('active');
+        mobileMenu?.classList.remove('active');
     });
     document.getElementById('loginBtnMobile')?.addEventListener('click', () => {
         openMenu(loginMenu);
-        mobileMenuMain.classList.remove('active');
+        mobileMenu?.classList.remove('active');
     });
 
     // Регистрация
@@ -110,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             try {
-                const res = await fetch('https://chupep.ru/api/new_user', {
+                const res = await fetch(`${API_BASE_URL}/new_user`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -155,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const res = await fetch('https://chupep.ru/api/token', {
+                const res = await fetch(`${API_BASE_URL}/token`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -190,6 +212,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 }); 
-
-
-
