@@ -199,13 +199,30 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 })
 
-// Получение данных пользователя
-function fetchUserProfile() {
-	const token = localStorage.getItem('token')
-	if (!token) {
-		window.location.href = '/'
-	}
-}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+	const token = localStorage.getItem('token');
+	const payload = { key: 'value' };
+
+	fetch(`${API_BASE_URL}/me`, {
+		method: 'POST', 
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${token}`,
+		},
+		body: JSON.stringify(payload)
+	})
+		.then(response => response.json())
+		.then(data => {
+			alert(`Ответ: ${JSON.stringify(data)}`);
+		})
+		.catch(error => {
+			alert(`Ошибка: ${error.message}`);
+		});
+});
+
+  
 
 // Вызываем функции при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
@@ -220,67 +237,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 })
 
-//отображение данных пользователя на странице профиля при обновлении страницы
-async function displayUserProfile() {
-	try {
-		const token = localStorage.getItem('token')
-		if (!token) {
-			window.location.href = '/'
-			return
-		}
-
-		const response = await fetch(`${API_BASE_URL}/me`, {
-			...baseRequestOptions,
-			headers: {
-				...baseRequestOptions.headers,
-				'Authorization': `Bearer ${token}`
-			}
-		})
-
-		if (!response.ok) {
-			throw new Error('Не удалось получить данные пользователя')
-		}
-
-		const userData = await response.json()
-
-		// Обновляем информацию на странице
-		const profileName = document.querySelector('.profile-header-text h2')
-		const profileUsername = document.querySelector('.profile-header-text h4')
-		const avatarImg = document.getElementById('avatarImg')
-
-		if (profileName) profileName.textContent = userData.full_name || 'Имя не указано'
-		if (profileUsername) profileUsername.textContent = `@${userData.username}`
-		if (avatarImg) {
-			// Получаем аватар через отдельный эндпоинт
-			const avatarResponse = await fetch(`${API_BASE_URL}/me/get_avatar`, {
-				...baseRequestOptions,
-				headers: {
-					...baseRequestOptions.headers,
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			if (avatarResponse.ok) {
-				// Создаем URL для полученного изображения
-				const blob = await avatarResponse.blob()
-				const imageUrl = URL.createObjectURL(blob)
-				avatarImg.src = imageUrl
-			} else {
-				// Если аватар не найден, используем дефолтное изображение
-				avatarImg.src = '../image/default-avatar.png'
-			}
-		}
-
-	} catch (error) {
-		console.error('Ошибка при загрузке профиля:', error)
-		alert('Не удалось загрузить данные профиля')
-		localStorage.removeItem('token')
-		window.location.href = '/'
-	}
-}
 
 
-// Вызываем функцию при загрузке страницы профиля
-if (window.location.pathname.includes('profile')) {
-	displayUserProfile()
-}
