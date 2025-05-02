@@ -250,8 +250,25 @@ async function displayUserProfile() {
 
 		if (profileName) profileName.textContent = userData.full_name || 'Имя не указано'
 		if (profileUsername) profileUsername.textContent = `@${userData.username}`
-		if (avatarImg && userData.avatar_url) {
-			avatarImg.src = userData.avatar_url
+		if (avatarImg) {
+			// Получаем аватар через отдельный эндпоинт
+			const avatarResponse = await fetch(`${API_BASE_URL}/users/me/get_avatar`, {
+				...baseRequestOptions,
+				headers: {
+					...baseRequestOptions.headers,
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			if (avatarResponse.ok) {
+				// Создаем URL для полученного изображения
+				const blob = await avatarResponse.blob()
+				const imageUrl = URL.createObjectURL(blob)
+				avatarImg.src = imageUrl
+			} else {
+				// Если аватар не найден, используем дефолтное изображение
+				avatarImg.src = '../image/default-avatar.png'
+			}
 		}
 
 	} catch (error) {
