@@ -229,7 +229,7 @@ async function displayUserProfile() {
 			return
 		}
 
-		const response = await fetch(`${API_BASE_URL}/users/me`, {
+		const response = await fetch(`${API_BASE_URL}/me`, {
 			...baseRequestOptions,
 			headers: {
 				...baseRequestOptions.headers,
@@ -252,7 +252,7 @@ async function displayUserProfile() {
 		if (profileUsername) profileUsername.textContent = `@${userData.username}`
 		if (avatarImg) {
 			// Получаем аватар через отдельный эндпоинт
-			const avatarResponse = await fetch(`${API_BASE_URL}/users/me/get_avatar`, {
+			const avatarResponse = await fetch(`${API_BASE_URL}/me/get_avatar`, {
 				...baseRequestOptions,
 				headers: {
 					...baseRequestOptions.headers,
