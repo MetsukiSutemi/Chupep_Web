@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chupep</title>
     <link rel="stylesheet" href="../styles/profile_styles.css">
 </head>
@@ -22,20 +22,23 @@
     <main>
         <div class="profile">
             <div class="profile-header">
-                <div class="profile-header-user-info">
-                    <label for="avatarInput" class="avatar-label">
-                        <img id="avatarImg" 
-                             src="../image/default-avatar.png" 
-                             alt="Profile avatar">
-                    </label>
-                    <input type="file" 
-                           id="avatarInput" 
-                           accept="image/*" 
-                           style="display: none;">
-                    <div class="profile-header-text">
-                        <h2>Загрузка...</h2>
-                        <h4>@загрузка...</h4>
+                <div class="profile-header-top">
+                    <div class="profile-header-user-info">
+                        <label for="avatarInput" class="avatar-label">
+                            <img id="avatarImg" 
+                                 src="../image/default-avatar.png" 
+                                 alt="Profile avatar">
+                        </label>
+                        <input type="file" 
+                               id="avatarInput" 
+                               accept="image/*" 
+                               style="display: none;">
+                        <div class="profile-header-text">
+                            <h2>Загрузка...</h2>
+                            <h4>@загрузка...</h4>
+                        </div>
                     </div>
+                    <button class="mobile-menu-btn">☰</button>
                 </div>
                 <div class="profile-header-bar">
                     <button class="tab-btn active" data-target="settings">Настройки</button>
@@ -97,7 +100,20 @@
             </div>
         </div>
     </main>
-</body>
 
-<script src="../js/script.js"></script>
+    <!-- Мобильное меню -->
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">×</button>
+        <div class="profile-header-bar">
+            <button class="tab-btn active" data-target="settings">Настройки</button>
+            <button class="tab-btn" data-target="security">Безопасность</button>
+            <button class="tab-btn" data-target="notifications">Уведомления</button>
+            <button class="tab-btn" data-target="devices">Устройства</button>
+            <button class="tab-btn" data-target="linked-accounts">Привязанные аккаунты</button>
+            <button class="tab-btn-exit" data-target="exit">Выйти</button>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
 </html>

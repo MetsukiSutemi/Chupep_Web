@@ -76,11 +76,26 @@ document.addEventListener('DOMContentLoaded', function () {
 	})
 
 	// Мобильное меню
-	const mobileMenuBtn = document.getElementById('mobileMenuBtn')
-	const mobileMenu = document.getElementById('mobileMenu')
-	mobileMenuBtn?.addEventListener('click', () => {
-		mobileMenu.classList.toggle('active')
-	})
+	const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+	const mobileMenu = document.querySelector('.mobile-menu');
+	const mobileMenuClose = document.querySelector('.mobile-menu-close');
+
+	mobileMenuBtn.addEventListener('click', () => {
+		mobileMenu.classList.add('active');
+	});
+
+	mobileMenuClose.addEventListener('click', () => {
+		mobileMenu.classList.remove('active');
+	});
+
+	// Закрытие меню при клике вне меню
+	document.addEventListener('click', (e) => {
+		if (mobileMenu.classList.contains('active') && 
+			!mobileMenu.contains(e.target) && 
+			e.target !== mobileMenuBtn) {
+			mobileMenu.classList.remove('active');
+		}
+	});
 
 	// Мобильные кнопки авторизации
 	document
@@ -94,6 +109,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		openMenu(loginMenu)
 		mobileMenu.classList.remove('active')
 	})
+
+	// Закрытие мобильного меню по клику на любую кнопку меню
+	const menuButtons = document.querySelectorAll('.mobile-menu .profile-header-bar button');
+
+	menuButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			mobileMenu.classList.remove('active');
+		});
+	});
 
 	// Регистрация
 	const registrationForm = document.getElementById('registrationForm')
@@ -199,8 +223,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 })
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
 	if (window.location.pathname.includes('profile')) {
 		const token = localStorage.getItem('token');
@@ -223,8 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 	}
 });
-
-  
 
 // Вызываем функции при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
