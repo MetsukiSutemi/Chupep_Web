@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const token = localStorage.getItem('token');
 		const payload = { key: 'value' };
 
-		fetch(`${API_BASE_URL}/me`, {
+		fetch(`${API_BASE_URL}/users/me`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json', 
