@@ -280,56 +280,6 @@ async function displayUserProfile() {
 }
 
 
-// Функция для обновления аватара пользователя
-async function updateAvatar(file) {
-	try {
-		const token = localStorage.getItem('token')
-		if (!token) {
-			throw new Error('Токен не найден')
-		}
-
-		const formData = new FormData()
-		formData.append('file', file)
-
-		const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
-			method: 'PUT',
-			...baseRequestOptions,
-			headers: {
-				'Authorization': `Bearer ${token}`
-			},
-			body: formData
-		})
-
-		if (!response.ok) {
-			throw new Error('Не удалось обновить аватар')
-		}
-
-		// Обновляем отображение аватара на странице
-		const avatarImg = document.getElementById('avatarImg')
-		if (avatarImg) {
-			const blob = await response.blob()
-			const imageUrl = URL.createObjectURL(blob)
-			avatarImg.src = imageUrl
-		}
-
-	} catch (error) {
-		console.error('Ошибка при обновлении аватара:', error)
-		alert('Не удалось обновить аватар')
-	}
-}
-
-// Добавляем обработчик события изменения файла для аватара
-const avatarInput = document.getElementById('avatarInput')
-if (avatarInput) {
-	avatarInput.addEventListener('change', (e) => {
-		const file = e.target.files[0]
-		if (file) {
-			updateAvatar(file)
-		}
-	})
-}
-
-
 // Вызываем функцию при загрузке страницы профиля
 if (window.location.pathname.includes('profile')) {
 	displayUserProfile()
