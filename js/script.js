@@ -202,24 +202,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-	const token = localStorage.getItem('token');
-	const payload = { key: 'value' };
+	if (window.location.pathname.includes('profile')) {
+		const token = localStorage.getItem('token');
+		const payload = { key: 'value' };
 
-	fetch(`${API_BASE_URL}/me`, {
-		method: 'POST', 
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${token}`,
-		},
-		body: JSON.stringify(payload)
-	})
-		.then(response => response.json())
-		.then(data => {
-			alert(`Ответ: ${JSON.stringify(data)}`);
+		fetch(`${API_BASE_URL}/me`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json', 
+				'Authorization': `Bearer ${token}`,
+			},
+			body: JSON.stringify(payload)
 		})
-		.catch(error => {
-			alert(`Ошибка: ${error.message}`);
-		});
+			.then(response => response.json())
+			.then(data => {
+				alert(`Ответ: ${JSON.stringify(data)}`);
+			})
+			.catch(error => {
+				alert(`Ошибка: ${error.message}`);
+			});
+	}
 });
 
   
