@@ -211,16 +211,38 @@ button:active{
     align-items: center;
     justify-content: space-between;
     margin-top: 40px;
+    flex-wrap: wrap;
 }
 
+.account-info-item p {
+    flex: 1;
+    min-width: 200px;
+    word-break: break-word;
+}
 
+.account-info-item button {
+    white-space: nowrap;
+    min-width: 100px;
+}
 
 .password-info{
     display: flex;
     gap: 10px;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
+.password-info p {
+    flex: 1;
+    min-width: 200px;
+    word-break: break-word;
+}
+
+.password-info button {
+    white-space: nowrap;
+    min-width: 100px;
+}
 
 .devices{
     color: #e61818;
@@ -412,6 +434,38 @@ button:active{
 
     .device {
         max-width: 100%;
+    }
+
+    .account-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .account-info-item p {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .account-info-item button {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .password-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .password-info p {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .password-info button {
+        width: 100%;
+        margin-top: 5px;
     }
 }
 
