@@ -10,18 +10,79 @@ document.addEventListener('DOMContentLoaded', function() {
 	console.log('Страница загружена');
 	
 	// Инициализация вкладок профиля
-	const tabs = document.querySelectorAll('.tab-btn');
+	const tabs = document.querySelectorAll('.tab-btn, .tab-btn-exit');
 	const contents = document.querySelectorAll('.tab-content');
 
+	// Функция для переключения вкладок
+	function switchTab(target) {
+		tabs.forEach(b => b.classList.remove('active'));
+		contents.forEach(c => c.classList.remove('active'));
+		
+		const activeBtn = document.querySelector(`[data-target="${target}"]`);
+		const activeContent = document.getElementById(target);
+		
+		if (activeBtn) activeBtn.classList.add('active');
+		if (activeContent) activeContent.classList.add('active');
+		
+		// Сохраняем активную вкладку
+		localStorage.setItem('activeProfileTab', target);
+	}
+
+	// Восстанавливаем активную вкладку или открываем настройки по умолчанию
+	const savedTab = localStorage.getItem('activeProfileTab') || 'settings';
+	switchTab(savedTab);
+
+	// Добавляем обработчики для кнопок
 	tabs.forEach(btn => {
 		btn.addEventListener('click', () => {
 			const target = btn.dataset.target;
-			tabs.forEach(b => b.classList.remove('active'));
-			contents.forEach(c => c.classList.remove('active'));
-			btn.classList.add('active');
-			document.getElementById(target).classList.add('active');
+			if (target) {
+				switchTab(target);
+			}
 		});
 	});
+
+	// Инициализация обработчиков для кнопок изменения данных
+	const nameButton = document.querySelector('.name-info button');
+	const emailButton = document.querySelector('.email-info button');
+	const passwordButton = document.querySelector('.password-info button');
+
+	if (nameButton) {
+		nameButton.addEventListener('click', () => {
+			const newName = prompt('Введите новое имя:');
+			if (newName) {
+				updateUserName(newName);
+			}
+		});
+	}
+
+	if (emailButton) {
+		emailButton.addEventListener('click', () => {
+			const newEmail = prompt('Введите новый email:');
+			if (newEmail) {
+				updateUserEmail(newEmail);
+			}
+		});
+	}
+
+	if (passwordButton) {
+		passwordButton.addEventListener('click', () => {
+			const oldPassword = prompt('Введите текущий пароль:');
+			const newPassword = prompt('Введите новый пароль:');
+			if (oldPassword && newPassword) {
+				updateUserPassword(oldPassword, newPassword);
+			}
+		});
+	}
+
+	// Обработчик кнопки выхода
+	const exitConfirmBtn = document.querySelector('.exit-confirm');
+	if (exitConfirmBtn) {
+		exitConfirmBtn.addEventListener('click', () => {
+			localStorage.removeItem('token');
+			window.location.href = '../index.html';
+		});
+	}
 
 	// Инициализация мобильного меню
 	const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
@@ -56,16 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			mobileMenu.classList.remove('active');
 		});
 	});
-
-	// Инициализация кнопки выхода
-	const exitButton = document.querySelector('.tab-btn-exit');
-	if (exitButton) {
-		exitButton.addEventListener('click', function() {
-			clearAvatarUrl();
-			localStorage.removeItem('token');
-			window.location.href = '../index.html';
-		});
-	}
 
 	// Инициализация загрузки аватара
 	const avatarImg = document.getElementById('avatarImg');
@@ -130,6 +181,33 @@ async function getUserInfo() {
 			const avatarImg = document.getElementById('avatarImg');
 			if (avatarImg && userInfo.avatar) {
 				avatarImg.src = userInfo.avatar;
+			}
+
+			// Обновляем информацию в настройках профиля
+			const usernameInfo = document.querySelector('.username-info p:nth-child(2)');
+			if (usernameInfo) {
+				usernameInfo.textContent = userInfo.username || 'Не указано';
+			}
+
+			const nameInfo = document.querySelector('.name-info p:nth-child(2)');
+			if (nameInfo) {
+				nameInfo.textContent = userInfo.name || 'Не указано';
+			}
+
+			const emailInfo = document.querySelector('.email-info p:nth-child(2)');
+			if (emailInfo) {
+				emailInfo.textContent = userInfo.email || 'Не указано';
+			}
+
+			const currentStatusInfo = document.querySelector('.current-status-info p:nth-child(2)');
+			if (currentStatusInfo) {
+				currentStatusInfo.textContent = userInfo.current_status === true ? 'Онлайн' : 'Оффлайн';
+			}
+
+			const createInfo = document.querySelector('.create-info p:nth-child(2)');
+			if (createInfo) {
+				const createdDate = new Date(userInfo.created_at);
+				createInfo.textContent = createdDate.toLocaleDateString('ru-RU');
 			}
 
 			// Обновляем информацию в настройках
@@ -210,6 +288,93 @@ async function getUserAvatar() {
             avatarElement.src = defaultAvatarUrl;
             console.log('Установлен аватар по умолчанию из-за ошибки');
         }
+    }
+}
+
+
+// Функции для обновления данных пользователя
+async function updateUserName(newName) {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/user/update_name`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: newName })
+        });
+
+        if (res.ok) {
+            alert('Имя успешно обновлено');
+            // Обновляем отображение имени на странице
+            const nameElement = document.querySelector('.name-info p:nth-child(2)');
+            if (nameElement) {
+                nameElement.textContent = newName;
+            }
+        } else {
+            const errorData = await res.json();
+            alert(`Ошибка обновления имени: ${errorData.detail || 'Неизвестная ошибка'}`);
+        }
+    } catch (err) {
+        console.error('Ошибка при обновлении имени:', err);
+        alert('Произошла ошибка при обновлении имени');
+    }
+}
+
+async function updateUserEmail(newEmail) {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/user/update_email`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: newEmail })
+        });
+
+        if (res.ok) {
+            alert('Email успешно обновлен');
+            // Обновляем отображение email на странице
+            const emailElement = document.querySelector('.email-info p:nth-child(2)');
+            if (emailElement) {
+                emailElement.textContent = newEmail;
+            }
+        } else {
+            const errorData = await res.json();
+            alert(`Ошибка обновления email: ${errorData.detail || 'Неизвестная ошибка'}`);
+        }
+    } catch (err) {
+        console.error('Ошибка при обновлении email:', err);
+        alert('Произошла ошибка при обновлении email');
+    }
+}
+
+async function updateUserPassword(oldPassword, newPassword) {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/user/update_password`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                old_password: oldPassword,
+                new_password: newPassword
+            })
+        });
+
+        if (res.ok) {
+            alert('Пароль успешно обновлен');
+        } else {
+            const errorData = await res.json();
+            alert(`Ошибка обновления пароля: ${errorData.detail || 'Неизвестная ошибка'}`);
+        }
+    } catch (err) {
+        console.error('Ошибка при обновлении пароля:', err);
+        alert('Произошла ошибка при обновлении пароля');
     }
 }
 

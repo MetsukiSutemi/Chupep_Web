@@ -53,21 +53,87 @@
                 <div id="settings" class="tab-content">
                     <div class="account-info">
                         <p>Настройки аккаунта</p>
-                        <div class="account-info-item">
+                        <div class="username-info">
+                            <p>Имя пользователя:</p>
+                            <p>Загрузка...</p>
+                            <button>Изменить</button>
+                        </div>
+                        <div class="name-info">
+                            <p>Имя:</p>
+                            <p>Загрузка...</p>
+                            <button>Изменить</button>
+                        </div>
+                        <div class="email-info">
+                            <p>Email:</p>
                             <p>Загрузка...</p>
                             <button>Изменить</button>
                         </div>
                         <div class="password-info">
+                            <p>Пароль:</p>
                             <p>**********</p>
                             <button>Изменить</button>
+                        </div>
+                        <div class="current-status-info">
+                            <p>Текущий статус:</p>
+                            <div class="current-status-info-item">
+                                <p>Онлайн</p>
+                            </div>
+                        </div>    
+                        <div class="create-info">
+                            <p>Дата создания:</p>
+                            <p>10.10.1000</p>
                         </div>
                     </div>
                 </div>
                 <div id="security" class="tab-content">
-                    <p>Здесь безопасность…</p>
+                    <div class="account-info">
+                        <p>Настройки безопасности</p>
+                        <div class="security-info">
+                            <p>Двухфакторная аутентификация:</p>
+                            <div class="security-status">
+                                <p>Отключена</p>
+                            </div>
+                            <button>Включить</button>
+                        </div>
+                        <div class="security-info">
+                            <p>Последний вход:</p>
+                            <p>10.10.2023 15:30</p>
+                        </div>
+                        <div class="security-info">
+                            <p>IP адрес:</p>
+                            <p>192.168.1.1</p>
+                        </div>
+                        <div class="security-info">
+                            <p>История входов:</p>
+                            <button>Просмотреть</button>
+                        </div>
+                    </div>
                 </div>
                 <div id="notifications" class="tab-content">
-                    <p>Здесь уведомления…</p>
+                    <div class="account-info">
+                        <p>Настройки уведомлений</p>
+                        <div class="notification-info">
+                            <p>Email уведомления:</p>
+                            <div class="notification-status">
+                                <p>Включены</p>
+                            </div>
+                            <button>Изменить</button>
+                        </div>
+                        <div class="notification-info">
+                            <p>Telegram уведомления:</p>
+                            <div class="notification-status">
+                                <p>Отключены</p>
+                            </div>
+                            <button>Изменить</button>
+                        </div>
+                        <div class="notification-info">
+                            <p>Уведомления о новых устройствах:</p>
+                            <div class="notification-status">
+                                <p>Включены</p>
+                            </div>
+                            <button>Изменить</button>
+                        </div>
+                    </div>
                 </div>
                 <div id="devices" class="tab-content">
                     <div class="devices-info">
@@ -89,13 +155,65 @@
                                 <button>Удалить</button>
                             </div>
                         </div>
+                        <div class="device">
+                            <div class="device-info">
+                                <div class="device-name">
+                                    <p>Устройство</p>
+                                </div>
+                                <div class="device-status">
+                                    <p>Онлайн</p>
+                                </div>
+                                <div class="device-ip">
+                                    <p>255.255.255.0</p>
+                                </div>
+                            </div>
+                            <div class="device-buttons">
+                                <button>Изменить</button>
+                                <button>Удалить</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="linked-accounts" class="tab-content">
-                    <p>Здесь привязанные аккаунты…</p>
+                    <div class="account-info">
+                        <p>Привязанные аккаунты</p>
+                        <div class="linked-account">
+                            <div class="account-info-item">
+                                <p>Telegram:</p>
+                                <div class="account-status">
+                                    <p>@username</p>
+                                </div>
+                            </div>
+                            <div class="account-buttons">
+                                <button>Изменить</button>
+                                <button>Отвязать</button>
+                            </div>
+                        </div>
+                        <div class="linked-account">
+                            <div class="account-info-item">
+                                <p>Telegram:</p>
+                                <div class="account-status">
+                                    <p>Не привязан</p>
+                                </div>
+                            </div>
+                            <div class="account-buttons">
+                                <button>Привязать</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="exit" class="tab-content">
-                    <p>Вы действительно хотите выйти?</p>
+                    <div class="account-info">
+                        <p>Подтверждение выхода</p>
+                        <div class="exit-info">
+                            <p>Вы действительно хотите выйти из аккаунта?</p>
+                            <p>После выхода вам потребуется снова войти в систему.</p>
+                        </div>
+                        <div class="exit-buttons">
+                            <button class="exit-confirm">Да, выйти</button>
+                            <button class="exit-cancel">Отмена</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
