@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://shupep.ru/api'
+const API_BASE_URL = 'http://shupep.ru/api'
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Мобильное меню для главной страницы
