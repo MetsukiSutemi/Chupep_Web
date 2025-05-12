@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://5.129.207.58/api'
+const API_BASE_URL = 'http://5.129.207.58'
 
 let isInitialized = false;
 

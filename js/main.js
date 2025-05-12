@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://5.129.207.58/api'
+const API_BASE_URL = 'http://5.129.207.58'
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Мобильное меню для главной страницы
