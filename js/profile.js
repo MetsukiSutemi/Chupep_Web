@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://shupep.ru/api'
+const API_BASE_URL = 'http://5.129.207.58'
 
 let isInitialized = false;
 
@@ -137,6 +137,56 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Загрузка данных пользователя
 	getUserInfo();
 	getUserAvatar();
+
+	// Инициализация раздела устройств
+	const devicesTab = document.getElementById('devices');
+	if (devicesTab) {
+		loadDevices();
+		// Обработчик добавления устройства
+		const addDeviceForm = document.getElementById('addDeviceForm');
+		if (addDeviceForm) {
+			addDeviceForm.addEventListener('submit', async function(e) {
+				e.preventDefault();
+				const nameInput = document.getElementById('deviceNameInput');
+				const name = nameInput.value.trim();
+				if (!name) return;
+				await addDevice(name);
+				nameInput.value = '';
+				loadDevices();
+			});
+		}
+	}
+
+	// Модальное окно для добавления устройства
+	const openAddDeviceModalBtn = document.getElementById('openAddDeviceModal');
+	const addDeviceModal = document.getElementById('addDeviceModal');
+	const closeAddDeviceModalBtn = document.getElementById('closeAddDeviceModal');
+	const addDeviceFormModal = document.getElementById('addDeviceFormModal');
+	const deviceNameInputModal = document.getElementById('deviceNameInputModal');
+
+	if (openAddDeviceModalBtn && addDeviceModal && closeAddDeviceModalBtn) {
+		openAddDeviceModalBtn.addEventListener('click', () => {
+			addDeviceModal.style.display = 'block';
+			deviceNameInputModal.value = '';
+			deviceNameInputModal.focus();
+		});
+		closeAddDeviceModalBtn.addEventListener('click', () => {
+			addDeviceModal.style.display = 'none';
+		});
+		window.addEventListener('click', (e) => {
+			if (e.target === addDeviceModal) {
+				addDeviceModal.style.display = 'none';
+			}
+		});
+		addDeviceFormModal.addEventListener('submit', async function(e) {
+			e.preventDefault();
+			const name = deviceNameInputModal.value.trim();
+			if (!name) return;
+			await addDevice(name);
+			addDeviceModal.style.display = 'none';
+			loadDevices();
+		});
+	}
 });
 
 // Получение данных авторизованного пользователя через API
@@ -421,6 +471,191 @@ async function handleFileChange(e) {
             console.error('Ошибка при загрузке аватара:', err);
             alert('Произошла ошибка при загрузке аватара');
         }
+    }
+}
+
+async function loadDevices() {
+    const token = localStorage.getItem('token');
+    const devicesList = document.getElementById('devicesList');
+    if (!devicesList) return;
+    devicesList.innerHTML = 'Загрузка...';
+    try {
+        const res = await fetch(`${API_BASE_URL}/device/my_devices`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+        const text = await res.text();
+        let devices = [];
+        try { devices = text ? JSON.parse(text) : []; } catch { devices = []; }
+        if (res.ok) {
+            if (devices.length === 0) {
+                devicesList.innerHTML = '<p>Нет устройств</p>';
+                return;
+            }
+            devicesList.innerHTML = devices.map(device => renderDeviceStyled(device)).join('');
+            // Навешиваем обработчики на кнопки
+            devices.forEach(device => {
+                const delBtn = document.getElementById(`deleteDeviceBtn_${device.id}`);
+                if (delBtn) {
+                    delBtn.addEventListener('click', async () => {
+                        if (confirm('Удалить устройство?')) {
+                            await deleteDevice(device.id);
+                            loadDevices();
+                        }
+                    });
+                }
+                const regenBtn = document.getElementById(`regenCodeBtn_${device.id}`);
+                if (regenBtn) {
+                    regenBtn.addEventListener('click', async () => {
+                        await regenerateDeviceCode(device.id);
+                        loadDevices();
+                    });
+                }
+                // --- Кнопки показать/скрыть и копировать код ---
+                const codeId = `codeValue_${device.id}`;
+                const showBtnId = `showCodeBtn_${device.id}`;
+                const copyBtnId = `copyCodeBtn_${device.id}`;
+                const codeElem = document.getElementById(codeId);
+                const showBtn = document.getElementById(showBtnId);
+                const copyBtn = document.getElementById(copyBtnId);
+                if (showBtn && codeElem) {
+                    showBtn.addEventListener('click', () => {
+                        if (codeElem.classList.contains('code-hidden')) {
+                            codeElem.classList.remove('code-hidden');
+                            showBtn.textContent = 'Скрыть';
+                        } else {
+                            codeElem.classList.add('code-hidden');
+                            showBtn.textContent = 'Показать';
+                        }
+                    });
+                }
+                if (copyBtn && codeElem) {
+                    copyBtn.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(device.code || '');
+                            copyBtn.textContent = 'Скопировано!';
+                            setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
+                        } catch {
+                            copyBtn.textContent = 'Ошибка';
+                            setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
+                        }
+                    });
+                }
+            });
+        } else {
+            devicesList.innerHTML = `<p>Ошибка загрузки: ${devices.detail || text}</p>`;
+        }
+    } catch (err) {
+        devicesList.innerHTML = `<p>Ошибка: ${err.message}</p>`;
+    }
+}
+
+function renderDeviceStyled(device) {
+    const codeId = `codeValue_${device.id}`;
+    const showBtnId = `showCodeBtn_${device.id}`;
+    const copyBtnId = `copyCodeBtn_${device.id}`;
+    return `
+    <div class="device">
+      <div class="device-row">
+        <div class="device-name"><b>Имя:</b> ${device.name || '—'}</div>
+        <div class="device-status"><b>Статус:</b> ${device.current_status ? 'Онлайн' : 'Оффлайн'}</div>
+        <div class="device-ip"><b>IP:</b> ${device.ip || '—'}</div>
+      </div>
+      <div class="device-row">
+        <div class="device-code">
+          <b>Код:</b>
+          <span id="${codeId}" class="code-value code-hidden">${device.code || '—'}</span>
+          <button class="show-code-btn" id="${showBtnId}" aria-label="Показать/скрыть код" title="Показать/скрыть код">Показать</button>
+          <button class="copy-code-btn" id="${copyBtnId}" aria-label="Скопировать код" title="Скопировать код">Скопировать</button>
+        </div>
+      </div>
+      <div class="device-row">
+        <div><b>Создано:</b> ${device.created_at ? new Date(device.created_at).toLocaleString('ru-RU') : '—'}</div>
+        <div><b>Последняя активность:</b> ${device.last_status_active ? new Date(device.last_status_active).toLocaleString('ru-RU') : '—'}</div>
+      </div>
+      <div class="device-row device-actions">
+        <button id="regenCodeBtn_${device.id}">Обновить код</button>
+        <button id="deleteDeviceBtn_${device.id}">Удалить</button>
+      </div>
+    </div>
+    `;
+}
+
+async function addDevice(name) {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE_URL}/device/add_device`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ name })
+        });
+        if (res.ok) {
+            alert('Устройство добавлено!');
+        } else {
+            const text = await res.text();
+            let result;
+            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+            alert(`Ошибка добавления: ${result.detail || text}`);
+        }
+    } catch (err) {
+        alert(`Ошибка добавления: ${err.message}`);
+    }
+}
+
+async function deleteDevice(deviceId) {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE_URL}/device/delete_device/${deviceId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+        if (res.ok) {
+            alert('Устройство удалено!');
+        } else {
+            const text = await res.text();
+            let result;
+            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+            alert(`Ошибка удаления: ${result.detail || text}`);
+        }
+    } catch (err) {
+        alert(`Ошибка удаления: ${err.message}`);
+    }
+}
+
+async function regenerateDeviceCode(deviceId) {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE_URL}/device/regenerate_code/${deviceId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
+        if (res.ok) {
+            alert('Код устройства обновлён!');
+        } else {
+            const text = await res.text();
+            let result;
+            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+            alert(`Ошибка обновления кода: ${result.detail || text}`);
+        }
+    } catch (err) {
+        alert(`Ошибка обновления кода: ${err.message}`);
     }
 }
 

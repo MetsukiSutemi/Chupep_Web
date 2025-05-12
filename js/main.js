@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://chupep.ru'
+const API_BASE_URL = 'http://5.129.207.58'
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Мобильное меню для главной страницы
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			try {
-				const res = await fetch(`${API_BASE_URL}/new_user`, {
+				const res = await fetch(`${API_BASE_URL}/user/new_user`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

@@ -138,38 +138,41 @@
                 <div id="devices" class="tab-content">
                     <div class="devices-info">
                         <p>Устройства</p>
-                        <div class="device">
-                            <div class="device-info">
-                                <div class="device-name">
-                                    <p>Устройство</p>
+                        <button id="openAddDeviceModal" class="add-device-btn">Добавить устройство</button>
+                        <div id="devicesList">
+                            <div class="device">
+                                <div class="device-info">
+                                    <div class="device-name">
+                                        <p>Устройство</p>
+                                    </div>
+                                    <div class="device-status">
+                                        <p>Онлайн</p>
+                                    </div>
+                                    <div class="device-ip">
+                                        <p>255.255.255.0</p>
+                                    </div>
                                 </div>
-                                <div class="device-status">
-                                    <p>Онлайн</p>
-                                </div>
-                                <div class="device-ip">
-                                    <p>255.255.255.0</p>
-                                </div>
-                            </div>
-                            <div class="device-buttons">
-                                <button>Изменить</button>
-                                <button>Удалить</button>
-                            </div>
-                        </div>
-                        <div class="device">
-                            <div class="device-info">
-                                <div class="device-name">
-                                    <p>Устройство</p>
-                                </div>
-                                <div class="device-status">
-                                    <p>Онлайн</p>
-                                </div>
-                                <div class="device-ip">
-                                    <p>255.255.255.0</p>
+                                <div class="device-buttons">
+                                    <button>Изменить</button>
+                                    <button>Удалить</button>
                                 </div>
                             </div>
-                            <div class="device-buttons">
-                                <button>Изменить</button>
-                                <button>Удалить</button>
+                            <div class="device">
+                                <div class="device-info">
+                                    <div class="device-name">
+                                        <p>Устройство</p>
+                                    </div>
+                                    <div class="device-status">
+                                        <p>Онлайн</p>
+                                    </div>
+                                    <div class="device-ip">
+                                        <p>255.255.255.0</p>
+                                    </div>
+                                </div>
+                                <div class="device-buttons">
+                                    <button>Изменить</button>
+                                    <button>Удалить</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,6 +232,18 @@
             <button class="tab-btn" data-target="devices">Устройства</button>
             <button class="tab-btn" data-target="linked-accounts">Привязанные аккаунты</button>
             <button class="tab-btn-exit" data-target="exit">Выйти</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления устройства -->
+    <div id="addDeviceModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="closeAddDeviceModal">&times;</span>
+            <h3>Добавить устройство</h3>
+            <form id="addDeviceFormModal">
+                <input type="text" id="deviceNameInputModal" placeholder="Имя устройства" required>
+                <button type="submit">Добавить</button>
+            </form>
         </div>
     </div>
 
