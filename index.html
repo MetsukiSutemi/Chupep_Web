@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chupep - Главная</title>
+    <title>Chupep - Управление ПК через Telegram</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
@@ -35,8 +35,112 @@
         <!-- Приветственный блок -->
         <section class="hero">
             <div class="hero-content">
-                <h1>Добро пожаловать в Chupep</h1>
-                <button id="ctaProjectsBtn">Просмотреть проекты</button>
+                <div class="hero-text">
+                    <h1>Управляйте своим ПК через Telegram</h1>
+                    <p class="hero-subtitle">Мощный и удобный бот для удаленного управления компьютером</p>
+                    <button id="startUsingBtn" class="cta-button">Начать пользоваться</button>
+                </div>
+                <div class="hero-visual">
+                    <div class="mockup-window">
+                        <div class="mockup-header">
+                            <div class="mockup-dot"></div>
+                            <div class="mockup-dot"></div>
+                            <div class="mockup-dot"></div>
+                        </div>
+                        <div class="mockup-content">
+                            <span class="prompt">></span> <span class="command command-1">get_system_info</span><br>
+                            <span class="output output-1">Загрузка ЦП: 15%, RAM: 45%...</span><br>
+                            <span class="prompt">></span> <span class="command command-2">run_program notepad.exe</span><br>
+                            <span class="output output-2">Программа notepad.exe запущена...</span><br>
+                            <span class="prompt">></span> <span class="command command-3">turn_off</span><br>
+                            <span class="output output-3">Компьютер выключается...</span><br>
+                            <span class="prompt">></span> <span class="cursor">_</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция преимуществ -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Почему выбирают Chupep?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Удобство использования</h3>
+                        <p>Управляйте компьютером прямо из Telegram - не нужно устанавливать дополнительные приложения</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Безопасность</h3>
+                        <p>Шифрованное соединение и авторизация через Telegram обеспечивают максимальную защиту</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Быстрая настройка</h3>
+                        <p>Настройте бота за 2 минуты и сразу начинайте управлять своим ПК удаленно</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖥️</div>
+                        <h3>Полный контроль</h3>
+                        <p>Запуск программ, управление файлами, мониторинг системы и многое другое</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>Доступ из любой точки</h3>
+                        <p>Управляйте компьютером из любой точки мира, где есть интернет</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💡</div>
+                        <h3>Умные команды</h3>
+                        <p>Создавайте собственные команды и автоматизируйте повседневные задачи</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция возможностей -->
+        <section class="capabilities">
+            <div class="container">
+                <h2 class="section-title">Что умеет Chupep?</h2>
+                <div class="capabilities-grid">
+                    <div class="capability-item">
+                        <h3>🖥️ Управление системой</h3>
+                        <ul>
+                            <li>Выключение, перезагрузка, сон</li>
+                            <li>Блокировка экрана</li>
+                            <li>Просмотр информации о системе</li>
+                            <li>Получение IP-адреса</li>
+                        </ul>
+                    </div>
+                    <div class="capability-item">
+                        <h3>🚀 Управление процессами</h3>
+                        <ul>
+                            <li>Запуск программ и процессов</li>
+                            <li>Завершение процессов по имени или ID</li>
+                            <li>Получение списка активных процессов</li>
+                        </ul>
+                    </div>
+                    <div class="capability-item">
+                        <h3>🎵 Управление медиа</h3>
+                        <ul>
+                            <li>Управление громкостью системы</li>
+                            <li>Пауза/воспроизведение видео</li>
+                            <li>Переключение треков (вперед/назад)</li>
+                            <li>Полное отключение звука</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция призыва к действию -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Готовы начать?</h2>
+                <p>Присоединяйтесь к тысячам пользователей, которые уже управляют своими ПК через Telegram</p>
+                <button id="ctaRegisterBtn" class="cta-button">Зарегистрироваться бесплатно</button>
             </div>
         </section>
     </main>

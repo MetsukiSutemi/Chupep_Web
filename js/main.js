@@ -1,6 +1,18 @@
 const API_BASE_URL = 'https://api.chupep.ru'
 
 document.addEventListener('DOMContentLoaded', function () {
+	// Эффект для хедера при прокрутке
+	const header = document.querySelector('header');
+	if (header) {
+		window.addEventListener('scroll', () => {
+			if (window.scrollY > 50) {
+				header.classList.add('scrolled');
+			} else {
+				header.classList.remove('scrolled');
+			}
+		});
+	}
+
 	// Мобильное меню для главной страницы
 	const mobileMenuBtnMain = document.getElementById('mobileMenuBtn')
 	const mobileMenuMain = document.getElementById('mobileMenu')
@@ -57,6 +69,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	loginBtn?.addEventListener('click', () => openMenu(loginMenu))
 	registerBtn?.addEventListener('click', () => openMenu(registrationMenu))
+
+	// Обработчики для новых кнопок
+	const startUsingBtn = document.getElementById('startUsingBtn')
+	const ctaRegisterBtn = document.getElementById('ctaRegisterBtn')
+
+	startUsingBtn?.addEventListener('click', () => {
+		// Плавная прокрутка к секции возможностей
+		const capabilitiesSection = document.querySelector('.capabilities')
+		if (capabilitiesSection) {
+			capabilitiesSection.scrollIntoView({ 
+				behavior: 'smooth',
+				block: 'start'
+			})
+		}
+	})
+
+	ctaRegisterBtn?.addEventListener('click', () => {
+		openMenu(registrationMenu)
+	})
 
 	closeButtons.forEach(button => {
 		button.addEventListener('click', () => {

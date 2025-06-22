@@ -198,14 +198,22 @@ async function getUserInfo() {
 			return;
 		}
 
-		const res = await fetch(`${API_BASE_URL}/user/get_user_info`, {
+		const res = await fetch(`${API_BASE_URL}/user/me`, {
 			method: 'GET',
 			headers: {
-				'Authorization': `Bearer ${token}`,
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
 				'Accept': 'application/json'
 			},
 			credentials: 'include'
 		});
+
+		if (!res.ok) {
+			if (res.status === 401) {
+				localStorage.removeItem('token');
+				window.location.href = '../index.html';
+			}
+			throw new Error('Ошибка получения данных пользователя');
+		}
 
 		const text = await res.text();
 		let result;
@@ -255,9 +263,9 @@ async function getUserInfo() {
 			}
 
 			const createInfo = document.querySelector('.create-info p:nth-child(2)');
-			if (createInfo) {
-				const createdDate = new Date(userInfo.created_at);
-				createInfo.textContent = createdDate.toLocaleDateString('ru-RU');
+			if (createInfo && userInfo.created_at) {
+				const date = new Date(userInfo.created_at);
+				createInfo.textContent = date.toLocaleDateString('ru-RU');
 			}
 
 			// Обновляем информацию в настройках
@@ -268,395 +276,383 @@ async function getUserInfo() {
 		} else {
 			const errorMessage = result.detail || text || 'Неизвестная ошибка';
 			alert(`Ошибка получения данных: ${errorMessage}`);
-			window.location.href = '../index.html';
+			// window.location.href = '../index.html';
 		}
 	} catch (err) {
 		alert(`Ошибка получения данных: ${err.message}`);
-		window.location.href = '../index.html';
+		// window.location.href = '../index.html';
 	}
 }
 
-// Функция для получения и отображения аватара пользователя
+// Получение аватара пользователя
 async function getUserAvatar() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Токен не найден');
-            throw new Error('Токен не найден');
-        }
+	try {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			return;
+		}
 
-        console.log('Получение аватара...');
-        // Добавляем timestamp для предотвращения кэширования
-        const timestamp = new Date().getTime();
-        const res = await fetch(`${API_BASE_URL}/user/get_avatar?t=${timestamp}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
-        });
+		const res = await fetch(`${API_BASE_URL}/user/avatar`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Accept': 'application/json'
+			},
+			credentials: 'include'
+		});
 
-        console.log('Статус ответа:', res.status);
-        
-        if (res.ok) {
-            const blob = await res.blob();
-            console.log('Получен blob:', blob);
-            const imageUrl = URL.createObjectURL(blob);
-            console.log('Создан URL:', imageUrl);
-            
-            const avatarElement = document.getElementById('avatarImg');
-            console.log('Найден элемент аватара:', avatarElement);
-            
-            if (avatarElement) {
-                // Очищаем старый URL перед установкой нового
-                if (avatarElement.src) {
-                    URL.revokeObjectURL(avatarElement.src);
-                }
-                avatarElement.src = imageUrl;
-                console.log('Аватар установлен');
-            } else {
-                console.error('Элемент аватара не найден');
-            }
-        } else {
-            console.error('Ошибка получения аватара:', res.status);
-            // Используем аватар по умолчанию при ошибке
-            const defaultAvatarUrl = '../image/default-avatar.png';
-            const avatarElement = document.getElementById('avatarImg');
-            if (avatarElement) {
-                avatarElement.src = defaultAvatarUrl;
-                console.log('Установлен аватар по умолчанию');
-            }
-        }
-    } catch (err) {
-        console.error(`Ошибка при загрузке аватара: ${err.message}`);
-        // Используем аватар по умолчанию при ошибке
-        const defaultAvatarUrl = '../image/default-avatar.png';
-        const avatarElement = document.getElementById('avatarImg');
-        if (avatarElement) {
-            avatarElement.src = defaultAvatarUrl;
-            console.log('Установлен аватар по умолчанию из-за ошибки');
-        }
-    }
+		if (res.ok) {
+			const avatarData = await res.json();
+			const avatarImg = document.getElementById('avatarImg');
+			if (avatarImg && avatarData.avatar_url) {
+				avatarImg.src = avatarData.avatar_url;
+			}
+		}
+	} catch (error) {
+		console.error('Ошибка получения аватара:', error);
+	}
 }
-
 
 // Функции для обновления данных пользователя
 async function updateUserName(newName) {
-    try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/user/update_name`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: newName })
-        });
+	try {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			window.location.href = '../index.html';
+			return;
+		}
+		const res = await fetch(`${API_BASE_URL}/user/update_name`, {
+			method: 'PUT',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ name: newName })
+		});
 
-        if (res.ok) {
-            alert('Имя успешно обновлено');
-            // Обновляем отображение имени на странице
-            const nameElement = document.querySelector('.name-info p:nth-child(2)');
-            if (nameElement) {
-                nameElement.textContent = newName;
-            }
-        } else {
-            const errorData = await res.json();
-            alert(`Ошибка обновления имени: ${errorData.detail || 'Неизвестная ошибка'}`);
-        }
-    } catch (err) {
-        console.error('Ошибка при обновлении имени:', err);
-        alert('Произошла ошибка при обновлении имени');
-    }
+		if (res.ok) {
+			alert('Имя успешно обновлено');
+			// Обновляем отображение имени на странице
+			const nameElement = document.querySelector('.name-info p:nth-child(2)');
+			if (nameElement) {
+				nameElement.textContent = newName;
+			}
+		} else {
+			const errorData = await res.json();
+			alert(`Ошибка обновления имени: ${errorData.detail || 'Неизвестная ошибка'}`);
+		}
+	} catch (err) {
+		console.error('Ошибка при обновлении имени:', err);
+		alert('Произошла ошибка при обновлении имени');
+	}
 }
 
 async function updateUserEmail(newEmail) {
-    try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/user/update_email`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: newEmail })
-        });
+	try {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			window.location.href = '../index.html';
+			return;
+		}
+		const res = await fetch(`${API_BASE_URL}/user/update_email`, {
+			method: 'PUT',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ email: newEmail })
+		});
 
-        if (res.ok) {
-            alert('Email успешно обновлен');
-            // Обновляем отображение email на странице
-            const emailElement = document.querySelector('.email-info p:nth-child(2)');
-            if (emailElement) {
-                emailElement.textContent = newEmail;
-            }
-        } else {
-            const errorData = await res.json();
-            alert(`Ошибка обновления email: ${errorData.detail || 'Неизвестная ошибка'}`);
-        }
-    } catch (err) {
-        console.error('Ошибка при обновлении email:', err);
-        alert('Произошла ошибка при обновлении email');
-    }
+		if (res.ok) {
+			alert('Email успешно обновлен');
+			// Обновляем отображение email на странице
+			const emailElement = document.querySelector('.email-info p:nth-child(2)');
+			if (emailElement) {
+				emailElement.textContent = newEmail;
+			}
+		} else {
+			const errorData = await res.json();
+			alert(`Ошибка обновления email: ${errorData.detail || 'Неизвестная ошибка'}`);
+		}
+	} catch (err) {
+		console.error('Ошибка при обновлении email:', err);
+		alert('Произошла ошибка при обновлении email');
+	}
 }
 
 async function updateUserPassword(oldPassword, newPassword) {
-    try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/user/update_password`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                old_password: oldPassword,
-                new_password: newPassword
-            })
-        });
+	try {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			window.location.href = '../index.html';
+			return;
+		}
+		const res = await fetch(`${API_BASE_URL}/user/update_password`, {
+			method: 'PUT',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				old_password: oldPassword,
+				new_password: newPassword
+			})
+		});
 
-        if (res.ok) {
-            alert('Пароль успешно обновлен');
-        } else {
-            const errorData = await res.json();
-            alert(`Ошибка обновления пароля: ${errorData.detail || 'Неизвестная ошибка'}`);
-        }
-    } catch (err) {
-        console.error('Ошибка при обновлении пароля:', err);
-        alert('Произошла ошибка при обновлении пароля');
-    }
+		if (res.ok) {
+			alert('Пароль успешно обновлен');
+		} else {
+			const errorData = await res.json();
+			alert(`Ошибка обновления пароля: ${errorData.detail || 'Неизвестная ошибка'}`);
+		}
+	} catch (err) {
+		console.error('Ошибка при обновлении пароля:', err);
+		alert('Произошла ошибка при обновлении пароля');
+	}
 }
 
 // Очищаем сохраненный URL аватара при выходе
 function clearAvatarUrl() {
-    localStorage.removeItem('avatarUrl');
+	localStorage.removeItem('avatarUrl');
 }
 
 // Выносим обработчик в отдельную функцию
 function handleAvatarClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const fileInput = document.getElementById('avatarInput');
-    if (fileInput) {
-        fileInput.click();
-    }
+	e.preventDefault();
+	e.stopPropagation();
+	const fileInput = document.getElementById('avatarInput');
+	if (fileInput) {
+		fileInput.click();
+	}
 }
 
 // Выносим обработчик изменения файла в отдельную функцию
 async function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_BASE_URL}/user/update_avatar`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-            
-            if (res.ok) {
-                getUserAvatar();
-                alert('Аватар успешно обновлен');
-            } else {
-                const errorData = await res.json();
-                alert(`Ошибка обновления аватара: ${errorData.detail || 'Неизвестная ошибка'}`);
-            }
-        } catch (err) {
-            console.error('Ошибка при загрузке аватара:', err);
-            alert('Произошла ошибка при загрузке аватара');
-        }
-    }
+	const file = e.target.files[0];
+	if (!file) return;
+
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '../index.html';
+		return;
+	}
+
+	const formData = new FormData();
+	formData.append('file', file);
+	
+	const res = await fetch(`${API_BASE_URL}/user/update_avatar`, {
+		method: 'PUT',
+		headers: {
+			'Authorization': `Bearer ${localStorage.getItem('token')}`,
+		},
+		body: formData
+	});
+	
+	if (res.ok) {
+		getUserAvatar();
+		alert('Аватар успешно обновлен');
+	} else {
+		const errorData = await res.json();
+		alert(`Ошибка обновления аватара: ${errorData.detail || 'Неизвестная ошибка'}`);
+	}
 }
 
 async function loadDevices() {
-    const token = localStorage.getItem('token');
-    const devicesList = document.getElementById('devicesList');
-    if (!devicesList) return;
-    devicesList.innerHTML = 'Загрузка...';
-    try {
-        const res = await fetch(`${API_BASE_URL}/device/my_devices`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            },
-            credentials: 'include'
-        });
-        const text = await res.text();
-        let devices = [];
-        try { devices = text ? JSON.parse(text) : []; } catch { devices = []; }
-        if (res.ok) {
-            if (devices.length === 0) {
-                devicesList.innerHTML = '<p>Нет устройств</p>';
-                return;
-            }
-            devicesList.innerHTML = devices.map(device => renderDeviceStyled(device)).join('');
-            // Навешиваем обработчики на кнопки
-            devices.forEach(device => {
-                const delBtn = document.getElementById(`deleteDeviceBtn_${device.id}`);
-                if (delBtn) {
-                    delBtn.addEventListener('click', async () => {
-                        if (confirm('Удалить устройство?')) {
-                            await deleteDevice(device.id);
-                            loadDevices();
-                        }
-                    });
-                }
-                const regenBtn = document.getElementById(`regenCodeBtn_${device.id}`);
-                if (regenBtn) {
-                    regenBtn.addEventListener('click', async () => {
-                        await regenerateDeviceCode(device.id);
-                        loadDevices();
-                    });
-                }
-                // --- Кнопки показать/скрыть и копировать код ---
-                const codeId = `codeValue_${device.id}`;
-                const showBtnId = `showCodeBtn_${device.id}`;
-                const copyBtnId = `copyCodeBtn_${device.id}`;
-                const codeElem = document.getElementById(codeId);
-                const showBtn = document.getElementById(showBtnId);
-                const copyBtn = document.getElementById(copyBtnId);
-                if (showBtn && codeElem) {
-                    showBtn.addEventListener('click', () => {
-                        if (codeElem.classList.contains('code-hidden')) {
-                            codeElem.classList.remove('code-hidden');
-                            showBtn.textContent = 'Скрыть';
-                        } else {
-                            codeElem.classList.add('code-hidden');
-                            showBtn.textContent = 'Показать';
-                        }
-                    });
-                }
-                if (copyBtn && codeElem) {
-                    copyBtn.addEventListener('click', async () => {
-                        try {
-                            await navigator.clipboard.writeText(device.code || '');
-                            copyBtn.textContent = 'Скопировано!';
-                            setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
-                        } catch {
-                            copyBtn.textContent = 'Ошибка';
-                            setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
-                        }
-                    });
-                }
-            });
-        } else {
-            devicesList.innerHTML = `<p>Ошибка загрузки: ${devices.detail || text}</p>`;
-        }
-    } catch (err) {
-        devicesList.innerHTML = `<p>Ошибка: ${err.message}</p>`;
-    }
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '../index.html';
+		return;
+	}
+	try {
+		const res = await fetch(`${API_BASE_URL}/device/my_devices`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Accept': 'application/json'
+			},
+			credentials: 'include'
+		});
+		const text = await res.text();
+		let devices = [];
+		try { devices = text ? JSON.parse(text) : []; } catch { devices = []; }
+		if (res.ok) {
+			if (devices.length === 0) {
+				devicesList.innerHTML = '<p>Нет устройств</p>';
+				return;
+			}
+			devicesList.innerHTML = devices.map(device => renderDeviceStyled(device)).join('');
+			// Навешиваем обработчики на кнопки
+			devices.forEach(device => {
+				const delBtn = document.getElementById(`deleteDeviceBtn_${device.id}`);
+				if (delBtn) {
+					delBtn.addEventListener('click', async () => {
+						if (confirm('Удалить устройство?')) {
+							await deleteDevice(device.id);
+							loadDevices();
+						}
+					});
+				}
+				const regenBtn = document.getElementById(`regenCodeBtn_${device.id}`);
+				if (regenBtn) {
+					regenBtn.addEventListener('click', async () => {
+						await regenerateDeviceCode(device.id);
+						loadDevices();
+					});
+				}
+				// --- Кнопки показать/скрыть и копировать код ---
+				const codeId = `codeValue_${device.id}`;
+				const showBtnId = `showCodeBtn_${device.id}`;
+				const copyBtnId = `copyCodeBtn_${device.id}`;
+				const codeElem = document.getElementById(codeId);
+				const showBtn = document.getElementById(showBtnId);
+				const copyBtn = document.getElementById(copyBtnId);
+				if (showBtn && codeElem) {
+					showBtn.addEventListener('click', () => {
+						if (codeElem.classList.contains('code-hidden')) {
+							codeElem.classList.remove('code-hidden');
+							showBtn.textContent = 'Скрыть';
+						} else {
+							codeElem.classList.add('code-hidden');
+							showBtn.textContent = 'Показать';
+						}
+					});
+				}
+				if (copyBtn && codeElem) {
+					copyBtn.addEventListener('click', async () => {
+						try {
+							await navigator.clipboard.writeText(device.code || '');
+							copyBtn.textContent = 'Скопировано!';
+							setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
+						} catch {
+							copyBtn.textContent = 'Ошибка';
+							setTimeout(() => { copyBtn.textContent = 'Скопировать'; }, 1200);
+						}
+					});
+				}
+			});
+		} else {
+			devicesList.innerHTML = `<p>Ошибка загрузки: ${devices.detail || text}</p>`;
+		}
+	} catch (err) {
+		devicesList.innerHTML = `<p>Ошибка: ${err.message}</p>`;
+	}
 }
 
 function renderDeviceStyled(device) {
-    const codeId = `codeValue_${device.id}`;
-    const showBtnId = `showCodeBtn_${device.id}`;
-    const copyBtnId = `copyCodeBtn_${device.id}`;
-    return `
-    <div class="device">
-      <div class="device-row">
-        <div class="device-name"><b>Имя:</b> ${device.name || '—'}</div>
-        <div class="device-status"><b>Статус:</b> ${device.current_status ? 'Онлайн' : 'Оффлайн'}</div>
-        <div class="device-ip"><b>IP:</b> ${device.ip || '—'}</div>
-      </div>
-      <div class="device-row">
-        <div class="device-code">
-          <b>Код:</b>
-          <span id="${codeId}" class="code-value code-hidden">${device.code || '—'}</span>
-          <button class="show-code-btn" id="${showBtnId}" aria-label="Показать/скрыть код" title="Показать/скрыть код">Показать</button>
-          <button class="copy-code-btn" id="${copyBtnId}" aria-label="Скопировать код" title="Скопировать код">Скопировать</button>
-        </div>
-      </div>
-      <div class="device-row">
-        <div><b>Создано:</b> ${device.created_at ? new Date(device.created_at).toLocaleString('ru-RU') : '—'}</div>
-        <div><b>Последняя активность:</b> ${device.last_status_active ? new Date(device.last_status_active).toLocaleString('ru-RU') : '—'}</div>
-      </div>
-      <div class="device-row device-actions">
-        <button id="regenCodeBtn_${device.id}">Обновить код</button>
-        <button id="deleteDeviceBtn_${device.id}">Удалить</button>
-      </div>
-    </div>
-    `;
+	const codeId = `codeValue_${device.id}`;
+	const showBtnId = `showCodeBtn_${device.id}`;
+	const copyBtnId = `copyCodeBtn_${device.id}`;
+	return `
+	<div class="device">
+	  <div class="device-row">
+		<div class="device-name"><b>Имя:</b> ${device.name || '—'}</div>
+		<div class="device-status"><b>Статус:</b> ${device.current_status ? 'Онлайн' : 'Оффлайн'}</div>
+		<div class="device-ip"><b>IP:</b> ${device.ip || '—'}</div>
+	  </div>
+	  <div class="device-row">
+		<div class="device-code">
+		  <b>Код:</b>
+		  <span id="${codeId}" class="code-value code-hidden">${device.code || '—'}</span>
+		  <button class="show-code-btn" id="${showBtnId}" aria-label="Показать/скрыть код" title="Показать/скрыть код">Показать</button>
+		  <button class="copy-code-btn" id="${copyBtnId}" aria-label="Скопировать код" title="Скопировать код">Скопировать</button>
+		</div>
+	  </div>
+	  <div class="device-row">
+		<div><b>Создано:</b> ${device.created_at ? new Date(device.created_at).toLocaleString('ru-RU') : '—'}</div>
+		<div><b>Последняя активность:</b> ${device.last_status_active ? new Date(device.last_status_active).toLocaleString('ru-RU') : '—'}</div>
+	  </div>
+	  <div class="device-row device-actions">
+		<button id="regenCodeBtn_${device.id}">Обновить код</button>
+		<button id="deleteDeviceBtn_${device.id}">Удалить</button>
+	  </div>
+	</div>
+	`;
 }
 
 async function addDevice(name) {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch(`${API_BASE_URL}/device/add_device`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ name })
-        });
-        if (res.ok) {
-            alert('Устройство добавлено!');
-        } else {
-            const text = await res.text();
-            let result;
-            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
-            alert(`Ошибка добавления: ${result.detail || text}`);
-        }
-    } catch (err) {
-        alert(`Ошибка добавления: ${err.message}`);
-    }
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '../index.html';
+		return;
+	}
+	try {
+		const res = await fetch(`${API_BASE_URL}/device/add_device`, {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			credentials: 'include',
+			body: JSON.stringify({ name })
+		});
+		if (res.ok) {
+			alert('Устройство добавлено!');
+		} else {
+			const text = await res.text();
+			let result;
+			try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+			alert(`Ошибка добавления: ${result.detail || text}`);
+		}
+	} catch (err) {
+		alert(`Ошибка добавления: ${err.message}`);
+	}
 }
 
 async function deleteDevice(deviceId) {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch(`${API_BASE_URL}/device/delete_device/${deviceId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            },
-            credentials: 'include'
-        });
-        if (res.ok) {
-            alert('Устройство удалено!');
-        } else {
-            const text = await res.text();
-            let result;
-            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
-            alert(`Ошибка удаления: ${result.detail || text}`);
-        }
-    } catch (err) {
-        alert(`Ошибка удаления: ${err.message}`);
-    }
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '../index.html';
+		return;
+	}
+	try {
+		const res = await fetch(`${API_BASE_URL}/device/delete_device/${deviceId}`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Accept': 'application/json'
+			},
+			credentials: 'include'
+		});
+		if (res.ok) {
+			alert('Устройство удалено!');
+		} else {
+			const text = await res.text();
+			let result;
+			try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+			alert(`Ошибка удаления: ${result.detail || text}`);
+		}
+	} catch (err) {
+		alert(`Ошибка удаления: ${err.message}`);
+	}
 }
 
 async function regenerateDeviceCode(deviceId) {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch(`${API_BASE_URL}/device/regenerate_code/${deviceId}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            },
-            credentials: 'include'
-        });
-        if (res.ok) {
-            alert('Код устройства обновлён!');
-        } else {
-            const text = await res.text();
-            let result;
-            try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
-            alert(`Ошибка обновления кода: ${result.detail || text}`);
-        }
-    } catch (err) {
-        alert(`Ошибка обновления кода: ${err.message}`);
-    }
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '../index.html';
+		return;
+	}
+	try {
+		const res = await fetch(`${API_BASE_URL}/device/regenerate_code/${deviceId}`, {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'Accept': 'application/json'
+			},
+			credentials: 'include'
+		});
+		if (res.ok) {
+			alert('Код устройства обновлён!');
+		} else {
+			const text = await res.text();
+			let result;
+			try { result = text ? JSON.parse(text) : {}; } catch { result = { detail: text }; }
+			alert(`Ошибка обновления кода: ${result.detail || text}`);
+		}
+	} catch (err) {
+		alert(`Ошибка обновления кода: ${err.message}`);
+	}
 }
 
 
