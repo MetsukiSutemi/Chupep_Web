@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					localStorage.setItem('token', result.access_token)
 					alert('Вход выполнен успешно')
 					closeAllMenus()
-					window.location.href = 'profile/index.html'
+					window.location.href = '/profile/'
 				} else {
 					alert(`Ошибка авторизации: ${result.detail || text}`)
 				}
