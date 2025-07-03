@@ -198,7 +198,7 @@ async function getUserInfo() {
 			return;
 		}
 
-		const res = await fetch(`${API_BASE_URL}/user/me`, {
+		const res = await fetch(`${API_BASE_URL}/user/get_user_info`, {
 			method: 'GET',
 			headers: {
 				'Authorization': `Bearer ${localStorage.getItem('token')}`,
